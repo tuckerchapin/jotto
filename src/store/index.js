@@ -211,8 +211,8 @@ export default new Vuex.Store({
       state: {
         id: '',
         players: {},
-        words: ['', ''],
-        turns: [[], []],
+        player0Word: '',
+        player1Word: '',
         winner: '',
       },
 
@@ -222,7 +222,7 @@ export default new Vuex.Store({
         },
 
         theirId(_state, _getters, rootState) {
-          return rootState.lobby.id;
+          return rootState.lobby.opponentId;
         },
 
         myPlayerNumber(state, getters) {
@@ -234,11 +234,11 @@ export default new Vuex.Store({
         },
 
         myWord(state, getters) {
-          return state.words[getters.myPlayerNumber];
+          return state[`player${getters.myPlayerNumber}Word`];
         },
 
         theirWord(state, getters) {
-          return state.words[getters.theirPlayerNumber];
+          return state[`player${getters.theirPlayerNumber}Word`];
         },
       },
 
@@ -257,10 +257,15 @@ export default new Vuex.Store({
           }
         },
 
-        setWord(state, { player, word }) {
-          if (!state.words[player]) {
-            Vue.set(state.words, player, word);
-          }
+        // setWord(state, { player, word }) {
+        //   if (!state.words[player]) {
+        //     Vue.set(state.words, player, word);
+        //   }
+        // },
+
+        setWords(state, { player0Word, player1Word }) {
+          state.player0Word = player0Word;
+          state.player1Word = player1Word;
         },
 
         // setTurn(state, { player, word }) {
@@ -275,18 +280,23 @@ export default new Vuex.Store({
           }
         },
 
-        create({ rootState, commit, dispatch }) {
+        create({
+          state, rootState, commit, dispatch,
+        }) {
           const game = new PGame();
 
           const players = {};
           players[rootState.session.id] = 0;
           players[rootState.lobby.opponentId] = 1;
-          if (rootState.lobby.isOwner) {
+          if (!rootState.lobby.isOwner) {
             players[rootState.session.id] = 1;
             players[rootState.lobby.opponentId] = 0;
           }
           commit('setPlayers', players);
           game.set('players', players);
+          game.set('player0Word', '');
+          game.set('player1Word', '');
+          game.set('winner', state.winner);
 
           game.save()
             .then((newGame) => {
@@ -319,7 +329,12 @@ export default new Vuex.Store({
 
           // sync game info
           gameInstance.fetch().then(() => {
-            //
+            commit('setPlayers', { players: gameInstance.get('players') });
+            commit('setWinner', { winner: gameInstance.get('winner') });
+            commit('setWords', {
+              player0word: gameInstance.get('player0Word'),
+              player1word: gameInstance.get('player1Word'),
+            });
           });
         },
 
@@ -334,8 +349,14 @@ export default new Vuex.Store({
           });
         },
 
-        forfeit({ rootState, commit }) {
-          commit('setWinner', rootState.lobby.opponentId);
+        forfeit({ getters, dispatch }) {
+          gameInstance.set('winner', getters.theirId);
+          gameInstance.save().then(() => dispatch('sync', {}));
+        },
+
+        setMyWord({ getters, dispatch }, { word }) {
+          gameInstance.set(`player${getters.myPlayerNumber}Word`, word);
+          gameInstance.save().then(() => dispatch('sync', {}));
         },
       },
     },

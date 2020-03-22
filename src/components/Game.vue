@@ -5,6 +5,7 @@ export default {
 
   data() {
     return {
+      wordEntryField: '',
     };
   },
 
@@ -23,6 +24,14 @@ export default {
   },
 
   methods: {
+    handleWordEntry(value) {
+      this.wordEntryField = value;
+    },
+
+    handleSaveWord() {
+      console.log(this.myWord, this.theirWord, this.$store.getters['game/myPlayerNumber'], this.$store.getters['game/theirPlayerNumber'], this.wordEntryField);
+      this.$store.dispatch('game/setMyWord', { word: this.wordEntryField });
+    },
   },
 
   created() {
@@ -30,13 +39,31 @@ export default {
   },
 
   render() {
+    if (!this.myWord || !this.theirWord) { // word entry phase
+      return (
+        <div class='gamecontainer'>
+          {this.myWord
+            ? <div>{this.myWord}</div>
+            : <div>
+              <input onChange={(e) => this.handleWordEntry(e.target.value)}/>
+              <button onClick={this.handleSaveWord}>save</button>
+            </div>
+          }
+          <div>
+            {this.theirWord ? this.theirWord : 'waiting for opponent to choose a word'}
+          </div>
+        </div>
+      );
+    }
+
     return (
-      <div>
-        this is a game
-        <br/>
+      <div class='gamecontainer'>
+        <div>
         my word: {this.myWord}
-        <br/>
+        </div>
+        <div>
         their word: {this.theirWord}
+        </div>
       </div>
     );
   },
@@ -47,4 +74,8 @@ export default {
 <style src="@/globals.css"></style>
 
 <style>
+.gamecontainer {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
 </style>
