@@ -102,7 +102,9 @@ export default {
 <style>
 .gamecontainer {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: var(--column-size) var(--column-size);
+  column-gap: var(--column-gap);
+  justify-content: center;
 }
 
 .column {

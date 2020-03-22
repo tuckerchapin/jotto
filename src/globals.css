@@ -8,12 +8,16 @@
   --medium-grey: rgb(124, 124, 124);
   --dark-grey: rgb(64, 64, 64);
   --paper: rgb(244, 242, 231);
+  --gold: rgb(195, 156, 92);
   --light-blue: rgb(77, 159, 203);
 
   --button: black;
   --button-hover: var(--light-blue);
   --input: black;
   --input-active: var(--light-blue);
+
+  --column-size: 400px;
+  --column-gap: 50px;
 }
 
 body {
@@ -67,3 +71,7 @@ button:focus, input:focus {
     border-color: var(--button-hover);
   }
 
+.icon {
+  height: 25px;
+  width: 25px;
+}

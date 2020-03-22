@@ -87,7 +87,7 @@ export default new Vuex.Store({
         },
 
         myName(_state, _getters, rootState) {
-          return rootState.session.id;
+          return rootState.session.name;
         },
 
         theirId(state) {
@@ -95,7 +95,7 @@ export default new Vuex.Store({
         },
 
         theirName(state) {
-          return state.opponentId;
+          return state.opponentName;
         },
       },
 
