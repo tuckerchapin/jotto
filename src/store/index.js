@@ -122,6 +122,7 @@ export default new Vuex.Store({
           const newMembers = {};
           newMembers[rootState.session.id] = rootState.session.name;
           lobby.set('members', newMembers);
+          lobby.set('gameId', '');
 
           lobby.save()
             .then((newLobby) => {
@@ -155,7 +156,9 @@ export default new Vuex.Store({
             });
         },
 
-        sync({ rootState, commit, dispatch }, { id }) {
+        sync({
+          state, rootState, commit, dispatch,
+        }, { id }) {
           if (id) { // initial sync
             // so get id and subscribe
             commit('setId', { id });
@@ -177,10 +180,10 @@ export default new Vuex.Store({
             commit('setOwner', { isOwner });
 
             const gameId = lobbyInstance.get('gameId');
+            const prevGameId = state.gameId;
             commit('setGameId', { gameId });
-            console.log(gameId);
-            if (gameId) {
-              dispatch('game/join', { gameId }, { root: true });
+            if (gameId && gameId !== prevGameId) {
+              dispatch('game/join', { id: gameId }, { root: true });
             }
           });
         },
@@ -273,15 +276,10 @@ export default new Vuex.Store({
 
         setPlayers(state, { players }) {
           state.players = players;
-          // const ids = Object.keys(players);
-          // Vue.set(state.players, ids[0], players[ids[0]]);
-          // Vue.set(state.players, ids[1], players[ids[1]]);
         },
 
         setWinner(state, { winner }) {
-          if (!state.winner) {
-            state.winner = winner;
-          }
+          state.winner = winner;
         },
 
         setWords(state, { words }) {
@@ -370,21 +368,30 @@ export default new Vuex.Store({
           });
         },
 
-        cleanUp({ commit }) {
-          if (gameSubscription) {
+        clear({ state, commit }) {
+          console.log('i ran', state.players, state.winner, state.words, state.guesses);
+          try {
+            console.log('unsubscribed');
             gameSubscription.unsubscribe();
+          } catch (e) {
+            //
           }
 
           commit('setPlayers', { players: {} });
           commit('setWinner', { winner: '' });
           commit('setWords', { words: ['', ''] });
           commit('setGuesses', { guesses: [[], []] });
+
+          // if (!gameInstance.get('winner')) {
+          //   gameInstance.set('winner', getters.theirId);
+          //   gameInstance.save();
+          // }
         },
 
-        forfeit({ getters, dispatch }) {
-          gameInstance.set('winner', getters.theirId);
-          gameInstance.save().then(() => dispatch('sync', {}));
-        },
+        // forfeit({ getters, dispatch }) {
+        //   gameInstance.set('winner', getters.theirId);
+        //   gameInstance.save().then(() => dispatch('sync', {}));
+        // },
 
         setMyWord({ getters, dispatch }, { word }) {
           gameInstance.set(`player${getters.myPlayerNumber}Word`, word);
