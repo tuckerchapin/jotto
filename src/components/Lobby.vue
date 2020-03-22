@@ -14,10 +14,17 @@ export default {
     inGame() {
       return !!this.$store.state.lobby.gameId;
     },
+    // const winnerText = () => {
+    //   if (this.winner === this.$store.state.session.id) {
+    //     return 'You won!';
+    //   }
 
-    winner() {
-      return this.$store.state.game.winner;
-    },
+    //   if (this.winner === this.$store.state.lobby.opponentId) {
+    //     return `${this.$store.state.lobby.opponentName} wins!`;
+    //   }
+
+    //   return 'Draw!';
+    // };
 
     inLobby() {
       return !!this.$store.state.lobby.id;
@@ -63,7 +70,7 @@ export default {
   },
 
   render() {
-    if (this.inGame && !this.winner) {
+    if (this.inGame) {
       return (
         <div>
           <Game/>
@@ -72,22 +79,8 @@ export default {
     }
 
     if (this.inLobby) {
-      const winnerText = () => {
-        if (this.winner === this.$store.state.session.id) {
-          return 'You won!';
-        }
-
-        if (this.winner === this.$store.state.lobby.opponentId) {
-          return `${this.$store.state.lobby.opponentName} wins!`;
-        }
-
-        return 'Draw!';
-      };
-
       return (
         <div>
-          {this.winner ? <div>Game Over: {winnerText()}</div> : null}
-          <br/>
           {this.isOwner ? <button onClick={this.handleNewGame}>new game</button> : 'lobby owner starts game'}
         </div>
       );

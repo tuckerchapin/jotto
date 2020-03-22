@@ -10,6 +10,10 @@ export default {
   },
 
   computed: {
+    winner() {
+      return this.$store.state.game.winner;
+    },
+
     myWord() {
       return this.$store.getters['game/myWord'];
     },

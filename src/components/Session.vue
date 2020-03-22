@@ -12,27 +12,6 @@ export default {
     return (
       <div id="app">
         <Lobby/>
-
-        <div id="data">
-          session id: {this.$store.state.session.id || '<empty>'}
-          <br/>
-          name: {this.$store.state.session.name || '<empty>'}
-          <br/>
-          lobby id: {this.$store.state.lobby.id || '<not in a lobby>'}
-          {this.$store.state.lobby.id ? <button onClick={() => this.$store.dispatch('lobby/leave')}>leave lobby</button> : null}
-          <br/>
-          owner: {this.$store.state.lobby.isOwner ? 'yes' : 'no'}
-          <br/>
-          opponent: {this.$store.state.lobby.opponentName || '<no opponent>'}
-          <br/>
-          game id: {this.$store.state.lobby.gameId || '<not in a game>'}
-          <br/>
-          turn: {this.$store.getters['game/isMyTurn'] ? 'yes' : 'no'}
-          <br/>
-          winner: {this.$store.state.game.winner}
-          <br/>
-          game's own id: {this.$store.state.game.id}
-        </div>
       </div>
     );
   },
