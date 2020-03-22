@@ -211,8 +211,8 @@ export default new Vuex.Store({
       state: {
         id: '',
         players: {},
-        player0Word: '',
-        player1Word: '',
+        words: ['', ''],
+        turns: [[], []],
         winner: '',
       },
 
@@ -234,11 +234,11 @@ export default new Vuex.Store({
         },
 
         myWord(state, getters) {
-          return state[`player${getters.myPlayerNumber}Word`];
+          return state.words[getters.myPlayerNumber] || '';
         },
 
         theirWord(state, getters) {
-          return state[`player${getters.theirPlayerNumber}Word`];
+          return state.words[getters.theirPlayerNumber] || '';
         },
       },
 
@@ -257,15 +257,9 @@ export default new Vuex.Store({
           }
         },
 
-        // setWord(state, { player, word }) {
-        //   if (!state.words[player]) {
-        //     Vue.set(state.words, player, word);
-        //   }
-        // },
-
-        setWords(state, { player0Word, player1Word }) {
-          state.player0Word = player0Word;
-          state.player1Word = player1Word;
+        setWords(state, { words }) {
+          Vue.set(state.words, 0, words[0]);
+          Vue.set(state.words, 1, words[1]);
         },
 
         // setTurn(state, { player, word }) {
@@ -331,10 +325,7 @@ export default new Vuex.Store({
           gameInstance.fetch().then(() => {
             commit('setPlayers', { players: gameInstance.get('players') });
             commit('setWinner', { winner: gameInstance.get('winner') });
-            commit('setWords', {
-              player0word: gameInstance.get('player0Word'),
-              player1word: gameInstance.get('player1Word'),
-            });
+            commit('setWords', { words: [gameInstance.get('player0Word'), gameInstance.get('player1Word')] });
           });
         },
 
