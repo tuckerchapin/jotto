@@ -15,7 +15,7 @@ export default {
   },
 
   created() {
-    // this.$store.dispatch('lobby/autojoin');
+    this.$store.dispatch('game/autojoin');
   },
 
   render() {

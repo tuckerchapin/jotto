@@ -13,11 +13,12 @@ Parse.initialize(
 );
 
 const PLobby = Parse.Object.extend('Lobby');
-// const PGame = Parse.Object.extend('Game');
+const PGame = Parse.Object.extend('Game');
 
 let lobbyInstance;
 let lobbySubscription;
-// let gameInstance;
+let gameInstance;
+let gameSubscription;
 
 export default new Vuex.Store({
   state: {
@@ -79,6 +80,7 @@ export default new Vuex.Store({
         opponentId: '',
         opponentName: '',
         isOwner: false,
+        gameId: '',
       },
 
       getters: {
@@ -105,6 +107,10 @@ export default new Vuex.Store({
 
         setOwner(state, { isOwner }) {
           state.isOwner = isOwner;
+        },
+
+        setGameId(state, { gameId }) {
+          state.gameId = gameId;
         },
       },
 
@@ -175,6 +181,8 @@ export default new Vuex.Store({
             }
             commit('setOpponent', { id: opponentId, name: members[opponentId] || '' });
             commit('setOwner', { isOwner });
+
+            commit('setGameId', { gameId: lobbyInstance.get('gameId')})
           });
         },
 
@@ -199,7 +207,6 @@ export default new Vuex.Store({
           delete newMembers[rootState.session.id];
           lobbyInstance.set('members', newMembers);
           // TODO
-          // clean up on parse and dc properly
           lobbyInstance.save().then(() => { lobbyInstance = undefined; });
         },
       },
@@ -210,10 +217,10 @@ export default new Vuex.Store({
 
       state: {
         id: '',
-        userWord: '',
-        oppWord: '',
-        userTurns: [],
-        oppTurns: [],
+        players: [],
+        // words: [],
+        // turns: [],
+        winner: '',
       },
 
       getters: {
@@ -224,10 +231,74 @@ export default new Vuex.Store({
         setId(state, { id }) {
           state.id = id;
         },
+
+        setPlayers(state, { players }) {
+          state.players = players;
+        },
+
+        setWinner(state, { winner }) {
+          if (!state.winner) {
+            state.winner = winner;
+          }
+        },
+
+        // setWord(state, )
       },
 
       actions: {
+        autojoin({ rootState, dispatch }) {
+          if (rootState.lobby.gameId) {
+            dispatch('join', { id: rootState.lobby.gameId });
+          }
+        },
 
+        create({ rootState, commit, dispatch }) {
+          const game = new PGame();
+
+          let players = [rootState.lobby.opponentId, rootState.session.id];
+          if (rootState.lobby.isOwner) {
+            players = [rootState.session.id, rootState.lobby.opponentId];
+          }
+          commit('setPlayers', players)
+          game.set('players', players);
+
+          game.save()
+            .then((newGame) => {
+              dispatch('join', { id: newGame.id });
+            });
+        },
+
+        join() {
+
+        },
+
+        sync({ commit, dispatch }, { id }) {
+          if (id) { // initial sync
+            // so get id and subscribe
+            commit('setId', { id });
+            dispatch('subscribe');
+          }
+
+          // sync lobby info
+          gameInstance.fetch().then(() => {
+            //
+          });
+        },
+
+        async subscribe({ state, dispatch }) {
+          const query = new Parse.Query(PGame);
+          query.get(state.id);
+
+          gameSubscription = await query.subscribe();
+
+          gameSubscription.on('update', () => {
+            dispatch('sync', {});
+          });
+        },
+
+        forfeit() {
+
+        },
       },
     },
   },
