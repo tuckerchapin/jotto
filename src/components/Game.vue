@@ -9,6 +9,17 @@ export default {
   },
 
   computed: {
+    isWon() {
+      return !!this.$store.state.game.winner;
+    },
+
+    myWord() {
+      return this.$store.getters['game/myWord'];
+    },
+
+    theirWord() {
+      return this.$store.getters['game/theirWord'];
+    },
   },
 
   methods: {
@@ -22,6 +33,10 @@ export default {
     return (
       <div>
         this is a game
+        <br/>
+        my word: {this.myWord}
+        <br/>
+        their word: {this.theirWord}
       </div>
     );
   },

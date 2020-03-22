@@ -217,7 +217,29 @@ export default new Vuex.Store({
       },
 
       getters: {
+        myId(_state, _getters, rootState) {
+          return rootState.session.id;
+        },
 
+        theirId(_state, _getters, rootState) {
+          return rootState.lobby.id;
+        },
+
+        myPlayerNumber(state, getters) {
+          return state.players[getters.myId];
+        },
+
+        theirPlayerNumber(state, getters) {
+          return state.players[getters.theirId];
+        },
+
+        myWord(state, getters) {
+          return state.words[getters.myPlayerNumber];
+        },
+
+        theirWord(state, getters) {
+          return state.words[getters.theirPlayerNumber];
+        },
       },
 
       mutations: {
@@ -235,9 +257,11 @@ export default new Vuex.Store({
           }
         },
 
-        // setWord(state, { player, word }) {
-
-        // },
+        setWord(state, { player, word }) {
+          if (!state.words[player]) {
+            Vue.set(state.words, player, word);
+          }
+        },
 
         // setTurn(state, { player, word }) {
 
