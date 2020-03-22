@@ -1,6 +1,7 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
 import Parse from 'parse';
+import { generateCombination } from 'gfycat-style-urls';
 
 Vue.use(Vuex);
 
@@ -10,14 +11,6 @@ Parse.initialize(
   'zgQ2awszgoWkB84nETZ0FgIZUgDsvbwrzZwCb8kc', // app ID
   '6WyFKpJz71ZMUN176Z8awkQtP1ixXQDAdHah7MNe', // js key
 );
-
-// var client = new Parse.LiveQueryClient({
-//   applicationId: 'zgQ2awszgoWkB84nETZ0FgIZUgDsvbwrzZwCb8kc',
-//   serverURL: 'wss://jotto.back4app.io', // Example: 'wss://livequerytutorial.back4app.io'
-//   javascriptKey: '6WyFKpJz71ZMUN176Z8awkQtP1ixXQDAdHah7MNe',
-//   masterKey: 'Your master key here'
-// });
-// client.open();
 
 const PLobby = Parse.Object.extend('Lobby');
 // const PGame = Parse.Object.extend('Game');
@@ -70,7 +63,7 @@ export default new Vuex.Store({
 
           let name = localStorage.getItem('jotto__nickname');
           if (!name) {
-            name = 'WackyZanyLemur'; // TODO
+            name = generateCombination(1, '', true); // TODO
             localStorage.setItem('jotto__nickname', name);
           }
           commit('setName', { name });
@@ -83,8 +76,9 @@ export default new Vuex.Store({
 
       state: {
         id: '',
-        opponentName: '',
         opponentId: '',
+        opponentName: '',
+        isOwner: false,
       },
 
       getters: {
@@ -104,8 +98,13 @@ export default new Vuex.Store({
           window.history.pushState(null, null, url);
         },
 
-        setOpponent(state, { name }) {
+        setOpponent(state, { id, name }) {
+          state.opponentId = id;
           state.opponentName = name;
+        },
+
+        setOwner(state, { isOwner }) {
+          state.isOwner = isOwner;
         },
       },
 
@@ -131,7 +130,6 @@ export default new Vuex.Store({
         },
 
         join({ rootState, dispatch }, { id }) {
-          console.log(`attempting to join ${id}`);
           const query = new Parse.Query(PLobby);
           query.get(id)
             .then((lobby) => {
@@ -158,23 +156,25 @@ export default new Vuex.Store({
         },
 
         sync({ rootState, commit, dispatch }, { id }) {
-          console.log('syncing...');
           if (id) { // initial sync
             // so get id and subscribe
             commit('setId', { id });
             dispatch('subscribe');
           }
 
-          // get the opponent name
+          // sync lobby info
           lobbyInstance.fetch().then(() => {
-            // TODO bad, but also max of 2 iterations, sooooo...
-            // eslint-disable-next-line no-restricted-syntax
-            for (const oppId of Object.keys(lobbyInstance.get('members'))) {
-              if (oppId !== rootState.session.id) {
-                commit('setOpponent', { name: lobbyInstance.get('members')[oppId] });
-                break;
-              }
+            // get the opponent id and name, decide who is owner
+            const members = lobbyInstance.get('members');
+            let opponentId = Object.keys(members)[0];
+            let isOwner = false;
+            if (opponentId === rootState.session.id) {
+              // eslint-disable-next-line prefer-destructuring
+              opponentId = Object.keys(members)[1] || '';
+              isOwner = true;
             }
+            commit('setOpponent', { id: opponentId, name: members[opponentId] || '' });
+            commit('setOwner', { isOwner });
           });
         },
 
@@ -189,13 +189,18 @@ export default new Vuex.Store({
           });
         },
 
-        leave({ commit }) {
+        leave({ rootState, commit }) {
           commit('setId', { id: '' });
-          commit('setOpponent', { name: '' });
+          commit('setOpponent', { id: '', name: '' });
+          commit('setOwner', { isOwner: false });
           lobbySubscription.unsubscribe();
-          lobbyInstance = undefined;
+
+          const newMembers = lobbyInstance.get('members');
+          delete newMembers[rootState.session.id];
+          lobbyInstance.set('members', newMembers);
           // TODO
           // clean up on parse and dc properly
+          lobbyInstance.save().then(() => { lobbyInstance = undefined; });
         },
       },
     },
@@ -204,7 +209,11 @@ export default new Vuex.Store({
       namespaced: true,
 
       state: {
-
+        id: '',
+        userWord: '',
+        oppWord: '',
+        userTurns: [],
+        oppTurns: [],
       },
 
       getters: {
@@ -212,7 +221,9 @@ export default new Vuex.Store({
       },
 
       mutations: {
-
+        setId(state, { id }) {
+          state.id = id;
+        },
       },
 
       actions: {

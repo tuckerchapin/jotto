@@ -9,26 +9,25 @@ export default {
   },
 
   render() {
-    const stateViz = () => (
-      <div id="data">
-        session id: {this.$store.state.session.id || '<empty>'}
-        <br/>
-        name: {this.$store.state.session.name || '<empty>'}
-        <br/>
-        lobby id: {this.$store.state.lobby.id || '<not in a lobby>'}
-        {this.$store.state.lobby.id ? <button onClick={() => this.$store.dispatch('lobby/leave')}>leave lobby</button> : null}
-        <br/>
-        opponent: {this.$store.state.lobby.opponentName || '<no opponent>'}
-        <br/>
-        game id: {this.$store.state.game.id || '<not in a game>'}
-        <br/>
-      </div>
-    );
-
     return (
       <div id="app">
         <Lobby/>
-        {stateViz()}
+
+        <div id="data">
+          session id: {this.$store.state.session.id || '<empty>'}
+          <br/>
+          name: {this.$store.state.session.name || '<empty>'}
+          <br/>
+          lobby id: {this.$store.state.lobby.id || '<not in a lobby>'}
+          {this.$store.state.lobby.id ? <button onClick={() => this.$store.dispatch('lobby/leave')}>leave lobby</button> : null}
+          <br/>
+          owner: {this.$store.state.lobby.isOwner ? 'yes' : 'no'}
+          <br/>
+          opponent: {this.$store.state.lobby.opponentName || '<no opponent>'}
+          <br/>
+          game id: {this.$store.state.game.id || '<not in a game>'}
+          <br/>
+        </div>
       </div>
     );
   },

@@ -1,4 +1,5 @@
 <script>
+import Game from '@/components/Game.vue';
 
 export default {
   name: 'Lobby',
@@ -7,6 +8,20 @@ export default {
     return {
       lobbyEntryField: '',
     };
+  },
+
+  computed: {
+    inGame() {
+      return !!this.$store.state.game.id;
+    },
+
+    inLobby() {
+      return !!this.$store.state.lobby.id;
+    },
+
+    isOwner() {
+      return this.$store.state.lobby.isOwner;
+    },
   },
 
   methods: {
@@ -21,6 +36,10 @@ export default {
     handleCreateLobby() {
       this.$store.dispatch('lobby/create');
     },
+
+    handleNewGame() {
+      this.$store.dispatch('game/create');
+    },
   },
 
   created() {
@@ -28,21 +47,21 @@ export default {
   },
 
   render() {
-    // if (this.$store.state.lobby) {
-    //   if (this.$store.state.game) {
-    //     return (
-    //       <div>
-    //         hi there's a game!!
-    //       </div>
-    //     );
-    //   }
-    //   return (
-    //     <div>
-    //       hi there's no game
-    //       <button>start a new game</button>
-    //     </div>
-    //   );
-    // }
+    if (this.inGame) {
+      return (
+        <div>
+          <Game/>
+        </div>
+      );
+    }
+
+    if (this.inLobby) {
+      return (
+        <div>
+          {this.isOwner ? <button onClick={this.handleNewGame}>new game</button> : 'waiting for lobby owner to start'}
+        </div>
+      );
+    }
 
     return (
       <div>
@@ -60,11 +79,4 @@ export default {
 <style src="@/globals.css"></style>
 
 <style>
-#data {
-  position: absolute;
-  bottom: 0;
-  right: 0;
-  padding: 10px;
-  background-color: rgba(0, 0, 0, .5);
-}
 </style>
