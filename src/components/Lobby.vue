@@ -1,12 +1,15 @@
 <script>
 import Game from '@/components/Game.vue';
 
+let copiedTimeout;
+
 export default {
   name: 'Lobby',
 
   data() {
     return {
       lobbyEntryField: '',
+      justCopied: false,
     };
   },
 
@@ -48,6 +51,16 @@ export default {
     handleNewGame() {
       this.$store.dispatch('game/create');
     },
+
+    handleCopyInvite() {
+      navigator.clipboard.writeText(window.location.href)
+        .then(() => {
+          this.justCopied = true;
+          clearTimeout(copiedTimeout);
+          copiedTimeout = setTimeout(() => { this.justCopied = false; }, 2000);
+        })
+        .catch(() => {});
+    },
   },
 
   created() {
@@ -55,20 +68,26 @@ export default {
   },
 
   render() {
-    if (this.inLobby) {
-      if (this.theirId) {
-        return (
-          <div>
-            <Game/>
-          </div>
-        );
-      }
-
-      // {this.isOwner ? <button onClick={th
-      // is.handleNewGame}>new game</button> : 'lobby owner starts game'}
+    if (this.theirId) {
       return (
-        <div>
-          Waiting for another player...
+        <div class='in-game'>
+          <div class='lobby-header'>
+          </div>
+          <Game/>
+        </div>
+      );
+    }
+
+    if (this.inLobby) {
+      return (
+        <div class='lobby-select'>
+          <span>Waiting for another player...</span>
+          <button
+            class={`button small ${!this.justCopied || 'copied'}`}
+            onClick={this.handleCopyInvite}
+          >
+            {this.justCopied ? 'Copied!' : 'Copy invite link'}
+          </button>
         </div>
       );
     }
@@ -83,6 +102,7 @@ export default {
         </button>
         <span>or</span>
         <input
+          class='input'
           placeholder='Enter a lobby code...'
           value={this.lobbyEntryField}
           onChange={(e) => this.handleLobbyEntered(e.target.value)}
@@ -112,5 +132,18 @@ export default {
   font-style: italic;
   font-size: 1em;
   margin: 10px;
+}
+
+.copied {
+  color: var(--light-blue);
+}
+</style>
+
+<style>
+.in-game {
+  min-height: 100vh;
+}
+.lobby-header {
+
 }
 </style>

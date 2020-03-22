@@ -8,14 +8,21 @@
   --medium-grey: rgb(124, 124, 124);
   --dark-grey: rgb(64, 64, 64);
   --paper: rgb(244, 242, 231);
+  --light-blue: rgb(77, 159, 203);
 
   --button: black;
-  --button-hover: var(--medium-grey);
+  --button-hover: var(--light-blue);
+  --input: black;
+  --input-active: var(--light-blue);
 }
 
 body {
   margin: 0;
   background-color: var(--light-grey);
+}
+
+button:focus, input:focus {
+  outline: none !important;
 }
 
 .button {
@@ -29,18 +36,34 @@ body {
   font-weight: 400;
   font-size: 1.25em;
   color: var(--button);
-}
 
-  .button:focus {
-    outline: none !important;
-  }
+  transition: color .2s, border-color .2s, ;
+}
 
   .button:hover {
     border-color: var(--button-hover);
     color: var(--button-hover);
   }
 
-  .button:active {
-    border-color: var(black);
-    color: var(black);
+  .button.small {
+    font-size: 1em;
+    padding: 10px;
   }
+
+.input {
+  border: 1px solid var(--input);
+  border-radius: 4px;
+  padding: 15px;
+
+  font-family: var(--sans);
+  font-weight: 400;
+  font-size: 1.25em;
+  color: var(--input);
+
+  transition: border-color .2s;
+}
+
+  .input:focus {
+    border-color: var(--button-hover);
+  }
+
