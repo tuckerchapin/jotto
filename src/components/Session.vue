@@ -25,9 +25,13 @@ export default {
           <br/>
           opponent: {this.$store.state.lobby.opponentName || '<no opponent>'}
           <br/>
-          game id: {this.$store.state.game.id || '<not in a game>'}
+          game id: {this.$store.state.lobby.gameId || '<not in a game>'}
           <br/>
           turn: {this.$store.getters['game/isMyTurn'] ? 'yes' : 'no'}
+          <br/>
+          winner: {this.$store.state.game.winner}
+          <br/>
+          game's own id: {this.$store.state.game.id}
         </div>
       </div>
     );

@@ -22,6 +22,8 @@ let gameSubscription;
 
 export default new Vuex.Store({
   state: {
+    turnLimit: 10,
+    wordLength: 5,
   },
 
   mutations: {
@@ -174,7 +176,12 @@ export default new Vuex.Store({
             commit('setOpponent', { id: opponentId, name: members[opponentId] || '' });
             commit('setOwner', { isOwner });
 
-            commit('setGameId', { gameId: lobbyInstance.get('gameId') });
+            const gameId = lobbyInstance.get('gameId');
+            commit('setGameId', { gameId });
+            console.log(gameId);
+            if (gameId) {
+              dispatch('game/join', { gameId }, { root: true });
+            }
           });
         },
 
@@ -266,6 +273,9 @@ export default new Vuex.Store({
 
         setPlayers(state, { players }) {
           state.players = players;
+          // const ids = Object.keys(players);
+          // Vue.set(state.players, ids[0], players[ids[0]]);
+          // Vue.set(state.players, ids[1], players[ids[1]]);
         },
 
         setWinner(state, { winner }) {
@@ -279,9 +289,10 @@ export default new Vuex.Store({
           Vue.set(state.words, 1, words[1]);
         },
 
-        // setGuess(state, { player, word }) {
-
-        // }
+        setGuesses(state, { guesses }) {
+          Vue.set(state.guesses, 0, guesses[0]);
+          Vue.set(state.guesses, 1, guesses[1]);
+        },
       },
 
       actions: {
@@ -291,9 +302,7 @@ export default new Vuex.Store({
           }
         },
 
-        create({
-          state, rootState, commit, dispatch,
-        }) {
+        create({ rootState, commit, dispatch }) {
           const game = new PGame();
 
           const players = {};
@@ -303,13 +312,14 @@ export default new Vuex.Store({
             players[rootState.session.id] = 1;
             players[rootState.lobby.opponentId] = 0;
           }
-          commit('setPlayers', players);
+
+          commit('setPlayers', { players });
           game.set('players', players);
           game.set('player0Word', '');
           game.set('player1Word', '');
           game.set('player0Guesses', []);
           game.set('player1Guesses', []);
-          game.set('winner', state.winner);
+          game.set('winner', '');
 
           game.save()
             .then((newGame) => {
@@ -360,6 +370,17 @@ export default new Vuex.Store({
           });
         },
 
+        cleanUp({ commit }) {
+          if (gameSubscription) {
+            gameSubscription.unsubscribe();
+          }
+
+          commit('setPlayers', { players: {} });
+          commit('setWinner', { winner: '' });
+          commit('setWords', { words: ['', ''] });
+          commit('setGuesses', { guesses: [[], []] });
+        },
+
         forfeit({ getters, dispatch }) {
           gameInstance.set('winner', getters.theirId);
           gameInstance.save().then(() => dispatch('sync', {}));
@@ -370,7 +391,7 @@ export default new Vuex.Store({
           gameInstance.save().then(() => dispatch('sync', {}));
         },
 
-        setMyGuess({ getters, dispatch }, { word }) {
+        setMyGuess({ rootState, getters, dispatch }, { word }) {
           // scoring function
           let score = 0;
           const guess = word.toLowerCase().split('');
@@ -380,11 +401,22 @@ export default new Vuex.Store({
             const idx = theirWord.indexOf(letter);
             if (idx > -1) { // it does
               score += 1;
-              theirWord.splice(idx, 1); // remove it for later loops
+              theirWord.splice(idx, 1); // remove it for dupes
             }
           });
-
           gameInstance.add(`player${getters.myPlayerNumber}Guesses`, [word.toLowerCase(), score]);
+
+          // check for game win
+          if (word.toLowerCase() === getters.theirWord.toLowerCase()) {
+            gameInstance.set('winner', getters.myId);
+          } else if (
+            // if both have used up all their guesses, draw
+            getters.myGuesses.length === rootState.turnLimit
+            && getters.myGuesses.length === getters.theirGuesses.length
+          ) {
+            gameInstance.set('winner', 'draw');
+          }
+
           gameInstance.save().then(() => dispatch('sync', {}));
         },
       },
