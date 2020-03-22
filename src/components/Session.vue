@@ -15,9 +15,12 @@ export default {
         <br/>
         name: {this.$store.state.session.name || '<empty>'}
         <br/>
-        lobby id: {this.$store.state.lobby.id || '<empty>'}
+        lobby id: {this.$store.state.lobby.id || '<not in a lobby>'}
+        {this.$store.state.lobby.id ? <button onClick={() => this.$store.dispatch('lobby/leave')}>leave lobby</button> : null}
         <br/>
-        game id: {this.$store.state.game.id || '<empty>'}
+        opponent: {this.$store.state.lobby.opponentName || '<no opponent>'}
+        <br/>
+        game id: {this.$store.state.game.id || '<not in a game>'}
         <br/>
       </div>
     );

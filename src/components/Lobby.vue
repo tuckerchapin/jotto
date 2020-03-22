@@ -24,7 +24,7 @@ export default {
   },
 
   created() {
-    this.$store.dispatch('lobby/sync');
+    this.$store.dispatch('lobby/autojoin');
   },
 
   render() {
