@@ -26,6 +26,18 @@ export default {
     isOwner() {
       return this.$store.state.lobby.isOwner;
     },
+
+    theirId() {
+      return this.$store.getters['lobby/theirId'];
+    },
+
+    theirName() {
+      return this.$store.getters['lobby/theirName'];
+    },
+
+    myName() {
+      return this.$store.getters['lobby/myName'];
+    },
   },
 
   methods: {

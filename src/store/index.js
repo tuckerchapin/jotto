@@ -81,6 +81,24 @@ export default new Vuex.Store({
         gameId: '',
       },
 
+      getters: {
+        myId(_state, _getters, rootState) {
+          return rootState.session.id;
+        },
+
+        myName(_state, _getters, rootState) {
+          return rootState.session.id;
+        },
+
+        theirId(state) {
+          return state.opponentId;
+        },
+
+        theirName(state) {
+          return state.opponentId;
+        },
+      },
+
       mutations: {
         setId(state, { id }) {
           state.id = id;
@@ -368,10 +386,8 @@ export default new Vuex.Store({
           });
         },
 
-        clear({ state, commit }) {
-          console.log('i ran', state.players, state.winner, state.words, state.guesses);
+        clear({ commit }) {
           try {
-            console.log('unsubscribed');
             gameSubscription.unsubscribe();
           } catch (e) {
             //
@@ -381,17 +397,7 @@ export default new Vuex.Store({
           commit('setWinner', { winner: '' });
           commit('setWords', { words: ['', ''] });
           commit('setGuesses', { guesses: [[], []] });
-
-          // if (!gameInstance.get('winner')) {
-          //   gameInstance.set('winner', getters.theirId);
-          //   gameInstance.save();
-          // }
         },
-
-        // forfeit({ getters, dispatch }) {
-        //   gameInstance.set('winner', getters.theirId);
-        //   gameInstance.save().then(() => dispatch('sync', {}));
-        // },
 
         setMyWord({ getters, dispatch }, { word }) {
           gameInstance.set(`player${getters.myPlayerNumber}Word`, word);
