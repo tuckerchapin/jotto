@@ -27,6 +27,7 @@ export default {
           <br/>
           game id: {this.$store.state.game.id || '<not in a game>'}
           <br/>
+          turn: {this.$store.getters['game/isMyTurn'] ? 'yes' : 'no'}
         </div>
       </div>
     );

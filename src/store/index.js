@@ -212,7 +212,7 @@ export default new Vuex.Store({
         id: '',
         players: {},
         words: ['', ''],
-        turns: [[], []],
+        guesses: [[], []],
         winner: '',
       },
 
@@ -240,6 +240,23 @@ export default new Vuex.Store({
         theirWord(state, getters) {
           return state.words[getters.theirPlayerNumber] || '';
         },
+
+        isMyTurn(state, getters) {
+          if (getters.myPlayerNumber === 0) {
+            // we're the owner, so we go first when equal
+            return state.guesses[0].length === state.guesses[1].length;
+          }
+          // otherwise if they are unequal then its our turn
+          return state.guesses[0].length !== state.guesses[1].length;
+        },
+
+        myGuesses(state, getters) {
+          return state.guesses[getters.myPlayerNumber] || [];
+        },
+
+        theirGuesses(state, getters) {
+          return state.guesses[getters.theirPlayerNumber] || [];
+        },
       },
 
       mutations: {
@@ -262,7 +279,7 @@ export default new Vuex.Store({
           Vue.set(state.words, 1, words[1]);
         },
 
-        // setTurn(state, { player, word }) {
+        // setGuess(state, { player, word }) {
 
         // }
       },
@@ -290,6 +307,8 @@ export default new Vuex.Store({
           game.set('players', players);
           game.set('player0Word', '');
           game.set('player1Word', '');
+          game.set('player0Guesses', []);
+          game.set('player1Guesses', []);
           game.set('winner', state.winner);
 
           game.save()
@@ -326,6 +345,7 @@ export default new Vuex.Store({
             commit('setPlayers', { players: gameInstance.get('players') });
             commit('setWinner', { winner: gameInstance.get('winner') });
             commit('setWords', { words: [gameInstance.get('player0Word'), gameInstance.get('player1Word')] });
+            commit('setGuesses', { guesses: [gameInstance.get('player0Guesses'), gameInstance.get('player1Guesses')] });
           });
         },
 
@@ -347,6 +367,24 @@ export default new Vuex.Store({
 
         setMyWord({ getters, dispatch }, { word }) {
           gameInstance.set(`player${getters.myPlayerNumber}Word`, word);
+          gameInstance.save().then(() => dispatch('sync', {}));
+        },
+
+        setMyGuess({ getters, dispatch }, { word }) {
+          // scoring function
+          let score = 0;
+          const guess = word.toLowerCase().split('');
+          const theirWord = getters.theirWord.split('');
+          guess.forEach((letter) => {
+            // check if target word contains a letter from the guess
+            const idx = theirWord.indexOf(letter);
+            if (idx > -1) { // it does
+              score += 1;
+              theirWord.splice(idx, 1); // remove it for later loops
+            }
+          });
+
+          gameInstance.add(`player${getters.myPlayerNumber}Guesses`, [word.toLowerCase(), score]);
           gameInstance.save().then(() => dispatch('sync', {}));
         },
       },
