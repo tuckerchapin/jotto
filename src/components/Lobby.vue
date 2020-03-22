@@ -11,21 +11,6 @@ export default {
   },
 
   computed: {
-    inGame() {
-      return !!this.$store.state.lobby.gameId;
-    },
-    // const winnerText = () => {
-    //   if (this.winner === this.$store.state.session.id) {
-    //     return 'You won!';
-    //   }
-
-    //   if (this.winner === this.$store.state.lobby.opponentId) {
-    //     return `${this.$store.state.lobby.opponentName} wins!`;
-    //   }
-
-    //   return 'Draw!';
-    // };
-
     inLobby() {
       return !!this.$store.state.lobby.id;
     },
@@ -70,28 +55,39 @@ export default {
   },
 
   render() {
-    if (this.inGame) {
-      return (
-        <div>
-          <Game/>
-        </div>
-      );
-    }
-
     if (this.inLobby) {
+      if (this.theirId) {
+        return (
+          <div>
+            <Game/>
+          </div>
+        );
+      }
+
+      // {this.isOwner ? <button onClick={th
+      // is.handleNewGame}>new game</button> : 'lobby owner starts game'}
       return (
         <div>
-          {this.isOwner ? <button onClick={this.handleNewGame}>new game</button> : 'lobby owner starts game'}
+          Waiting for another player...
         </div>
       );
     }
 
     return (
-      <div>
-        join a lobby <input onChange={(e) => this.handleLobbyEntered(e.target.value)}/>
-        <button onClick={this.handleJoinLobby}>join</button>
-        <br/>
-        <button onClick={this.handleCreateLobby}>create a lobby</button>
+      <div class='lobby-select'>
+        <button
+          class='button'
+          onClick={this.handleCreateLobby}
+        >
+          Create a lobby
+        </button>
+        <span>or</span>
+        <input
+          placeholder='Enter a lobby code...'
+          value={this.lobbyEntryField}
+          onChange={(e) => this.handleLobbyEntered(e.target.value)}
+          onKeyup={(e) => { if (e.key === 'Enter') this.handleJoinLobby(); } }
+        />
       </div>
     );
   },
@@ -102,4 +98,19 @@ export default {
 <style src="@/globals.css"></style>
 
 <style>
+.lobby-select {
+  height: 100vh;
+  display: grid;
+  grid-template-columns: 300px;
+  align-content: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.lobby-select span {
+  font-family: var(--sans);
+  font-style: italic;
+  font-size: 1em;
+  margin: 10px;
+}
 </style>

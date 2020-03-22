@@ -1,0 +1,46 @@
+@import url('https://fonts.googleapis.com/css?family=Montserrat:300,400,500,600,700|Playfair+Display:400,400i,500,700&display=swap');
+
+:root {
+  --serif: 'Playfair Display', serif;
+  --sans: 'Montserrat', sans-serif;
+
+  --light-grey: rgb(238, 238, 238);
+  --medium-grey: rgb(124, 124, 124);
+  --dark-grey: rgb(64, 64, 64);
+  --paper: rgb(244, 242, 231);
+
+  --button: black;
+  --button-hover: var(--medium-grey);
+}
+
+body {
+  margin: 0;
+  background-color: var(--light-grey);
+}
+
+.button {
+  border: 1px solid var(--button);
+  border-radius: 4px;
+  padding: 15px;
+
+  cursor: pointer;
+
+  font-family: var(--sans);
+  font-weight: 400;
+  font-size: 1.25em;
+  color: var(--button);
+}
+
+  .button:focus {
+    outline: none !important;
+  }
+
+  .button:hover {
+    border-color: var(--button-hover);
+    color: var(--button-hover);
+  }
+
+  .button:active {
+    border-color: var(black);
+    color: var(black);
+  }
