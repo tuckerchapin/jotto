@@ -39,10 +39,6 @@ export default new Vuex.Store({
         name: '',
       },
 
-      getters: {
-
-      },
-
       mutations: {
         setId(state, { id }) {
           state.id = id;
@@ -81,10 +77,6 @@ export default new Vuex.Store({
         opponentName: '',
         isOwner: false,
         gameId: '',
-      },
-
-      getters: {
-
       },
 
       mutations: {
@@ -182,7 +174,7 @@ export default new Vuex.Store({
             commit('setOpponent', { id: opponentId, name: members[opponentId] || '' });
             commit('setOwner', { isOwner });
 
-            commit('setGameId', { gameId: lobbyInstance.get('gameId')})
+            commit('setGameId', { gameId: lobbyInstance.get('gameId') });
           });
         },
 
@@ -201,6 +193,7 @@ export default new Vuex.Store({
           commit('setId', { id: '' });
           commit('setOpponent', { id: '', name: '' });
           commit('setOwner', { isOwner: false });
+          commit('setGameId', { gameId: '' });
           lobbySubscription.unsubscribe();
 
           const newMembers = lobbyInstance.get('members');
@@ -217,9 +210,9 @@ export default new Vuex.Store({
 
       state: {
         id: '',
-        players: [],
-        // words: [],
-        // turns: [],
+        players: {},
+        words: ['', ''],
+        turns: [[], []],
         winner: '',
       },
 
@@ -242,7 +235,13 @@ export default new Vuex.Store({
           }
         },
 
-        // setWord(state, )
+        // setWord(state, { player, word }) {
+
+        // },
+
+        // setTurn(state, { player, word }) {
+
+        // }
       },
 
       actions: {
@@ -255,21 +254,35 @@ export default new Vuex.Store({
         create({ rootState, commit, dispatch }) {
           const game = new PGame();
 
-          let players = [rootState.lobby.opponentId, rootState.session.id];
+          const players = {};
+          players[rootState.session.id] = 0;
+          players[rootState.lobby.opponentId] = 1;
           if (rootState.lobby.isOwner) {
-            players = [rootState.session.id, rootState.lobby.opponentId];
+            players[rootState.session.id] = 1;
+            players[rootState.lobby.opponentId] = 0;
           }
-          commit('setPlayers', players)
+          commit('setPlayers', players);
           game.set('players', players);
 
           game.save()
             .then((newGame) => {
+              lobbyInstance.set('gameId', newGame.id);
+              lobbyInstance.save();
               dispatch('join', { id: newGame.id });
             });
         },
 
-        join() {
-
+        join({ dispatch }, { id }) {
+          const query = new Parse.Query(PGame);
+          query.get(id)
+            .then((game) => {
+              gameInstance = game;
+              dispatch('sync', { id: game.id });
+            })
+            .catch((error) => {
+              alert('invalid game'); // TODO
+              console.error(error);
+            });
         },
 
         sync({ commit, dispatch }, { id }) {
@@ -279,7 +292,7 @@ export default new Vuex.Store({
             dispatch('subscribe');
           }
 
-          // sync lobby info
+          // sync game info
           gameInstance.fetch().then(() => {
             //
           });
@@ -296,8 +309,8 @@ export default new Vuex.Store({
           });
         },
 
-        forfeit() {
-
+        forfeit({ rootState, commit }) {
+          commit('setWinner', rootState.lobby.opponentId);
         },
       },
     },

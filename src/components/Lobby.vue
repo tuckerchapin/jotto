@@ -12,7 +12,7 @@ export default {
 
   computed: {
     inGame() {
-      return !!this.$store.state.game.id;
+      return !!this.$store.state.lobby.gameId;
     },
 
     inLobby() {
