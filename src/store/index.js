@@ -266,6 +266,7 @@ export default new Vuex.Store({
 
           game.save()
             .then((newGame) => {
+              // This feels dirty
               lobbyInstance.set('gameId', newGame.id);
               lobbyInstance.save();
               dispatch('join', { id: newGame.id });
