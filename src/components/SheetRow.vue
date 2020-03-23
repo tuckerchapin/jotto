@@ -124,7 +124,7 @@ export default {
     },
 
     handleSubmit() {
-      if (!this.disabled && this.isValidWord) {
+      if (!this.disabled && this.isValidWord && !this.noSubmit) {
         this.$emit('submit', this.rowWord);
       }
     },

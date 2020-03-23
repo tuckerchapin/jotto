@@ -429,8 +429,8 @@ export default new Vuex.Store({
             gameInstance.set('winner', getters.myId);
           } else if (
             // if both have used up all their guesses, draw
-            getters.myGuesses.length === rootState.turnLimit
-            && getters.myGuesses.length === getters.theirGuesses.length
+            getters.theirGuesses.length === rootState.turnLimit
+            && getters.myGuesses.length === rootState.turnLimit - 1
           ) {
             gameInstance.set('winner', 'draw');
           }
