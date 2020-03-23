@@ -85,7 +85,7 @@ export default {
 
     const sheetHeader = () => (
       <div class='sheet-header'>
-        <SheetRow header left/>
+        <SheetRow header left active word='poopy'/>
         <div>
           <button
             class='button small'
@@ -107,7 +107,7 @@ export default {
           <SheetRow left score={5}/>
           <SheetRow left score={4}/>
           <SheetRow left score={5}/>
-          <SheetRow left score={4}/>
+          <SheetRow left score={4} active/>
           <SheetRow left score={5}/>
           <SheetRow left score={4}/>
           <SheetRow left score={5}/>
@@ -119,7 +119,7 @@ export default {
           <SheetRow score={4}/>
           <SheetRow score={4}/>
           <SheetRow score={4}/>
-          <SheetRow score={4}/>
+          <SheetRow score={4} active/>
           <SheetRow score={4}/>
           <SheetRow score={4}/>
           <SheetRow score={4}/>
@@ -128,56 +128,6 @@ export default {
         </div>
       </div>
     );
-
-    // my word: {this.myWord}
-    // {this.theirGuesses.map((guess) => <div>{guess[1]} | {guess[0]}</div>)}
-    // their word: {this.theirWord}
-    // {this.myGuesses.map((guess) => <div>{guess[1]} | {guess[0]}</div>)}
-    //   <div>
-    //     <input onChange={(e) => this.handleWordEntry(e.target.value)}/>
-    //     {this.isMyTurn ? <button onClick={this.handleSaveGuess}>save</button> : null}
-    //   </div>
-    // if (!this.isInGame) {
-    //   return (
-    //   );
-    // }
-
-    // if (!this.myWord || !this.theirWord) { // word entry phase
-    //   return (
-    //     <div class='gamecontainer'>
-    //       {this.myWord
-    //         ? <div>{this.myWord}</div>
-    //         : <div>
-    //             <input
-    //               value={this.wordEntryField}
-    //               onChange={(e) => this.handleWordEntry(e.target.value)}
-    //             />
-    //             <button onClick={this.handleSaveWord}>save</button>
-    //           </div>
-    //       }
-    //       <div>
-    //         {this.theirWord ? this.theirWord : 'waiting for opponent to choose a word'}
-    //       </div>
-    //     </div>
-    //   );
-    // }
-
-    // return (
-    //   <div class='gamecontainer'>
-    //     <div class='column'>
-    //     my word: {this.myWord}
-    //     {this.myGuesses.map((guess) => <div>{guess[1]} | {guess[0]}</div>)}
-    //       <div>
-    //         <input onChange={(e) => this.handleWordEntry(e.target.value)}/>
-    //         {this.isMyTurn ? <button onClick={this.handleSaveGuess}>save</button> : null}
-    //       </div>
-    //     </div>
-    //     <div class='column'>
-    //     their word: {this.theirWord}
-    //     {this.theirGuesses.map((guess) => <div>{guess[1]} | {guess[0]}</div>)}
-    //     </div>
-    //   </div>
-    // );
   },
 };
 
@@ -198,6 +148,8 @@ export default {
 
 .status-bar {
   grid-area: status;
+  display: flex;
+  justify-content: center;
   /* display: flex;
   justify-content: space-between; */
 

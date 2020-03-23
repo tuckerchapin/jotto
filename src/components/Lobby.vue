@@ -160,8 +160,10 @@ export default {
 
 .lobby-header {
   display: grid;
-  grid-template-columns: var(--column-size) var(--column-size);
-  column-gap: var(--column-gap);
+  /* eslint-disable-next-line max-len */
+  --width: calc(var(--column-size) - var(--letter-box-dimension));
+  grid-template-columns: var(--width) var(--width);
+  column-gap: calc(var(--column-gap) + 2 * var(--letter-box-dimension));
   justify-content: center;
 }
 

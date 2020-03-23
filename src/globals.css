@@ -15,8 +15,8 @@
   --input: black;
   --input-active: var(--light-blue);
 
-  --column-size: min-content;/*400px;*/
-  --column-gap: 50px;
+  --column-size: 370px;/*400px;*/
+  --column-gap: 60px;
 
   --letter-box-border: var(--dark-grey);
   --letter-box-header-border: var(--medium-grey);
