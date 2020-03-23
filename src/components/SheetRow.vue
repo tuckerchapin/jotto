@@ -12,7 +12,7 @@ export default {
       type: Boolean,
       default: false,
     },
-    active: {
+    disabled: {
       type: Boolean,
       default: false,
     },
@@ -26,6 +26,7 @@ export default {
   data() {
     return {
       letterList: ['', '', '', '', ''],
+      selected: -1,
     };
   },
 
@@ -36,7 +37,61 @@ export default {
   },
 
   methods: {
-    // handle
+    handleSelect(i) {
+      if (!this.disabled) {
+        this.selected = i;
+      }
+    },
+
+    handleDeselect() {
+      this.selected = -1;
+    },
+
+    focus(i) {
+      if (i >= 0 && i <= 4) {
+        this.$refs[`letterBox${i}`].focus();
+      } else {
+        for (let j = 0; j <= 4; j += 1) {
+          this.$refs[`letterBox${j}`].focus();
+        }
+      }
+    },
+
+    handleKeyPress(e) {
+      if (!this.disabled) {
+        if (/^[a-zA-Z]$/.test(e.key)) {
+          this.$set(this.letterList, this.selected, e.key.toUpperCase());
+          if (this.selected < 4) {
+            this.selected += 1;
+          }
+        } else if (e.key === 'ArrowLeft') {
+          if (this.selected > 0) {
+            this.selected -= 1;
+          }
+        } else if (e.key === 'ArrowRight') {
+          if (this.selected < 4) {
+            this.selected += 1;
+          }
+        } else if (e.key === 'Backspace') {
+          if (this.letterList[this.selected]) {
+            // if there is a letter in this cell, delete it
+            this.$set(this.letterList, this.selected, '');
+
+            // if (this.selected > 0) {
+            //   this.selected -= 1;
+            // }
+          } else if (this.selected > 0) {
+            this.selected -= 1;
+            this.$set(this.letterList, this.selected, ''); // ??
+          }
+        }
+
+        this.focus(this.selected);
+
+        e.stopPropagation();
+        e.preventDefault();
+      }
+    },
   },
 
   created() {
@@ -48,17 +103,36 @@ export default {
   },
 
   render() {
+    const scoreBox = () => (
+      <div class='score-box'>
+        {!this.disabled
+          ? (
+            <svg class='icon check' version="1.1" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+              <path d="m0 53.891 11.109-14.445 28.891 24.445 46.668-52.223 13.332 12.223-58.891 64.441z"/>
+            </svg>
+          )
+          : <span class='score'>{this.score || ''}</span>
+        }
+      </div>
+    );
+
     return (
-      <div class={`sheet-row ${!this.header || 'header'} ${!this.active || 'active'}`}>
-        {!this.left ? <div class='score-box'>{this.score || ''}</div> : null}
+      <div class={`sheet-row ${!this.header || 'header'}`} onKeyup={this.handleKeyPress}>
+        {!this.left ? scoreBox() : null}
         <div class='letter-box-container'>
-          <div class='letter-box'>{this.letterList[0]}</div>
-          <div class='letter-box'>{this.letterList[1]}</div>
-          <div class='letter-box' disabled={!this.active}>{this.letterList[2]}</div>
-          <div class='letter-box' disabled={!this.active}>{this.letterList[3]}</div>
-          <div class='letter-box' disabled={!this.active}>{this.letterList[4]}</div>
+          {[0, 1, 2, 3, 4].map((i) => (
+            <div
+              class='letter-box'
+              ref={`letterBox${i}`}
+              tabindex={(!this.disabled) ? i : ''}
+              onFocus={() => this.handleSelect(i)}
+              onBlur={() => this.handleDeselect()}
+            >
+              {this.letterList[i]}
+            </div>
+          ))}
         </div>
-        {this.left ? <div class='score-box'>{this.score || ''}</div> : null}
+        {this.left ? scoreBox() : null}
       </div>
     );
   },
@@ -94,7 +168,7 @@ export default {
   justify-content: center;
   align-items: center;
   text-align: center;
-  background-color: white;
+  background-color: var(--letter-box-color);
   border: 1px solid var(--light-grey);
 }
 
@@ -110,6 +184,18 @@ export default {
     border-color: var(--letter-box-header-border);
   }
 
+  .letter-box:focus {
+    outline: none !important;
+    border-color: var(--light-blue);
+    /* animation: blinker 2s ease-in-out infinite; */
+  }
+
+  @keyframes blinker {
+    50% {
+      border-color: transparent;
+    }
+  }
+
 .score-box {
   background-color: var(--paper);
   color: var(--dark-grey);
@@ -118,5 +204,13 @@ export default {
 
   .header .score-box {
     display: none;
+  }
+
+  .score {
+    user-select: none;
+  }
+
+  .icon.check {
+    fill: var(--gold);
   }
 </style>

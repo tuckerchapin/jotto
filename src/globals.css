@@ -12,6 +12,8 @@
 
   --button: black;
   --button-hover: var(--light-blue);
+  --button-disabled: var(--dark-grey);
+
   --input: black;
   --input-active: var(--light-blue);
 
@@ -21,6 +23,7 @@
   --letter-box-border: var(--dark-grey);
   --letter-box-header-border: var(--medium-grey);
   --letter-box-dimension: 50px;
+  --letter-box-color: white;
 }
 
 body {
@@ -38,6 +41,7 @@ button:focus, input:focus {
   padding: 15px;
 
   cursor: pointer;
+  user-select: none;
 
   font-family: var(--sans);
   font-weight: 400;
@@ -50,6 +54,13 @@ button:focus, input:focus {
   .button:hover {
     border-color: var(--button-hover);
     color: var(--button-hover);
+  }
+
+  .button:disabled {
+    border-color: var(--button-disabled);
+    color: var(--button-disabled);
+
+    cursor: not-allowed;
   }
 
   .button.small {
