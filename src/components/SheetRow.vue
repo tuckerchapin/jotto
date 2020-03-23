@@ -24,6 +24,14 @@ export default {
       type: [Number, String],
       default: '',
     },
+    noSubmit: {
+      type: Boolean,
+      default: false,
+    },
+    highlight: {
+      type: Boolean,
+      default: false,
+    },
   },
 
   data() {
@@ -137,7 +145,7 @@ export default {
     const scoreBox = () => (
       !this.disabled
         ? (
-          <div class={`score-box submit-button ${this.isValidWord || 'disabled'}`} onClick={this.handleSubmit}>
+          <div class={`score-box submit-button ${(this.isValidWord && !this.noSubmit) || 'disabled'}`} onClick={this.handleSubmit}>
             <svg class='icon check' version="1.1" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
               <path d="m0 53.891 11.109-14.445 28.891 24.445 46.668-52.223 13.332 12.223-58.891 64.441z"/>
             </svg>
@@ -151,9 +159,10 @@ export default {
     );
 
     return (
-      <div class={`sheet-row ${!this.header || 'header'}`} onKeyup={this.handleKeyPress}>
+      <div class={`sheet-row ${!this.header || 'header'} ${!this.highlight || 'highlight'}`} onKeyup={this.handleKeyPress}>
         {!this.left ? scoreBox() : null}
         <div class='letter-box-container'>
+          <div class='letter-box-highlighter'></div>
           {[0, 1, 2, 3, 4].map((i) => (
             <div
               class='letter-box'
@@ -185,12 +194,34 @@ export default {
   display: flex;
   flex-direction: row;
   padding: 4px 8px;
+  position: relative;
+  /* margin-left: 4px; */
 }
 
   .header .letter-box-container {
     background-color: var(--letter-box-header-border);
     padding: 8px;
   }
+
+  .letter-box-highlighter {
+    display: none;
+  }
+
+  .highlight .letter-box-highlighter {
+    display: initial;
+    position: absolute;
+    background-color: var(--light-blue);
+    opacity: .25;
+    top: -2px;
+    left: 2px;
+    height: calc(100% + 4px);
+    width: calc(100% - 3px);
+    z-index: -1;
+  }
+
+  /* .highlight .letter-box-container {
+    background-color: var(--light-blue);
+  } */
 
 .letter-box, .score-box {
   font-family: var(--sans);

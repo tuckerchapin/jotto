@@ -18,6 +18,10 @@ export default {
   },
 
   computed: {
+    turnLimit() {
+      return this.$store.state.turnLimit;
+    },
+
     isInGame() {
       return !!this.$store.state.game.id;
     },
@@ -177,28 +181,29 @@ export default {
         {statusBar()}
         {sheetHeader()}
         <div id='my-sheet' class='sheet'>
-          <SheetRow disabled score={4} left/>
-          <SheetRow disabled score={4} left/>
-          <SheetRow disabled score={4} left/>
-          <SheetRow disabled score={4} left/>
-          <SheetRow disabled score={4} left/>
-          <SheetRow disabled score={4} left/>
-          <SheetRow disabled score={4} left/>
-          <SheetRow disabled score={4} left/>
-          <SheetRow disabled score={4} left/>
-          <SheetRow score={4} left onSubmit={alert}/>
+          {this.myGuesses.map(
+            ([word, score]) => <SheetRow disabled word={word} score={score} left/>,
+          )}
+          {[...Array(this.turnLimit - this.myGuesses.length)].map((_, key) => {
+            if (key === 0) {
+              return (
+                <SheetRow
+                  left
+                  highlight
+                  noSubmit={!this.isMyTurn}
+                  onSubmit={this.handleSaveGuess}
+                />
+              );
+            }
+            return <SheetRow disabled left/>;
+          })}
         </div>
+
         <div id='their-sheet' class='sheet'>
-          <SheetRow disabled score={4}/>
-          <SheetRow disabled score={4}/>
-          <SheetRow disabled score={4}/>
-          <SheetRow disabled score={4}/>
-          <SheetRow disabled score={4}/>
-          <SheetRow disabled score={4}/>
-          <SheetRow disabled score={4}/>
-          <SheetRow disabled score={4}/>
-          <SheetRow disabled score={4}/>
-          <SheetRow disabled score={4}/>
+          {this.theirGuesses.map(
+            ([word, score]) => <SheetRow disabled word={word} score={score}/>,
+          )}
+          {[...Array(this.turnLimit - this.theirGuesses.length)].map(() => <SheetRow disabled/>)}
         </div>
       </div>
     );
