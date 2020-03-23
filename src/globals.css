@@ -10,6 +10,7 @@
   --gold: rgb(195, 156, 92);
   --medium-blue: rgb(77, 159, 203);
   --light-blue: rgb(140, 187, 212);
+  --medium-green: rgb(71, 108, 47);
 
   --button: black;
   --button-hover: var(--medium-blue);
@@ -29,6 +30,11 @@
   --submit-button-hover: var(--medium-blue);
   --submit-button-icon: white;
   --submit-button-disabled: var(--medium-grey);
+
+  --gentle: var(--light-blue);
+  --neutral: var(--medium-grey);
+  --win: var(--medium-green);
+  --draw: var(--gold);
 }
 
 body {

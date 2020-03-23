@@ -134,23 +134,30 @@ export default {
         case NEW_GAME:
           if (this.isOwner) {
             this.statusText = 'Start a new game.';
+            this.statusClass = 'gentle';
           } else {
             this.statusText = 'Waiting for lobby owner to start a new game...';
+            this.statusClass = 'neutral';
           }
           break;
         case AWAIT_MY_SECRET:
           this.statusText = 'Choose your secret word.';
+          this.statusClass = 'attention pulse gentle';
           break;
         case AWAIT_THEIR_SECRET:
           this.statusText = 'Waiting for opponent to choose their secret word...';
+          this.statusClass = 'neutral';
           break;
         case GAME_OVER:
           if (this.winner === this.myId) {
             this.statusText = 'You win!';
+            this.statusClass = 'pulse win';
           } else if (this.winner === this.theirId) {
             this.statusText = `${this.theirName} wins!`;
+            this.statusClass = 'neutral';
           } else {
             this.statusText = 'Draw!';
+            this.statusClass = 'draw';
           }
 
           if (this.isOwner) {
@@ -159,9 +166,11 @@ export default {
           break;
         case MY_TURN:
           this.statusText = 'Your turn.';
+          this.statusClass = 'pulse gentle';
           break;
         case THEIR_TURN:
           this.statusText = `${this.theirName}'s turn...`;
+          this.statusClass = 'neutral';
           break;
         default:
           break;
@@ -176,7 +185,7 @@ export default {
 
   render() {
     const statusBar = () => (
-      <div class='status-bar'>
+      <div class={`status-bar ${this.statusClass}`}>
         <div class='status-flank'></div>
         <div class='status-text'>{this.statusText}</div>
         <div class='status-flank'></div>
@@ -309,34 +318,89 @@ export default {
     font-family: var(--sans);
     font-style: italic;
     font-weight: 300;
-  }
-
-  .action-waiting .status-text {
-    background-color: var(--medium-blue);
     font-style: normal;
-    color: white;
     z-index: 1;
   }
 
-  .action-waiting .status-flank:first-of-type {
-    animation: flash-left 2s ease-in-out infinite;
-    background-image: linear-gradient(to left, var(--medium-blue) 20px, transparent 30%);
+    .neutral .status-text {
+      background-color: var(--neutral);
+      color: white;
+    }
+
+    .neutral .status-flank:first-of-type {
+      background-image: linear-gradient(to left, var(--neutral) 20px, transparent 30%);
+    }
+
+    .neutral .status-flank:last-of-type {
+      background-image: linear-gradient(to right, var(--neutral) 20px, transparent 30%);
+    }
+
+    .gentle .status-text {
+      background-color: var(--gentle);
+      color: white;
+    }
+
+    .gentle .status-flank:first-of-type {
+      background-image: linear-gradient(to left, var(--gentle) 20px, transparent 30%);
+    }
+
+    .gentle .status-flank:last-of-type {
+      background-image: linear-gradient(to right, var(--gentle) 20px, transparent 30%);
+    }
+
+    .win .status-text {
+      background-color: var(--win);
+      color: white;
+    }
+
+    .win .status-flank:first-of-type {
+      background-image: linear-gradient(to left, var(--win) 20px, transparent 30%);
+    }
+
+    .win .status-flank:last-of-type {
+      background-image: linear-gradient(to right, var(--win) 20px, transparent 30%);
+    }
+
+    .draw .status-text {
+      background-color: var(--draw);
+      color: white;
+    }
+
+    .draw .status-flank:first-of-type {
+      background-image: linear-gradient(to left, var(--draw) 20px, transparent 30%);
+    }
+
+    .draw .status-flank:last-of-type {
+      background-image: linear-gradient(to right, var(--draw) 20px, transparent 30%);
+    }
+
+  /* .status-flank:first-of-type {
+    transform: translateX(20px);
+    animation: pulse-left .5s ease-in-out;
   }
 
-  .action-waiting .status-flank:last-of-type {
-    animation: flash-right 2s ease-in-out infinite;
-    background-image: linear-gradient(to right, var(--medium-blue) 20px, transparent 30%);
+  .status-flank:last-of-type {
+    transform: translateX(-20px);
+    animation: pulse-right .5s ease-in-out;
+  } */
+
+  .pulse .status-flank:first-of-type {
+    animation: pulse-left 2s ease-in-out infinite;
   }
 
-  @keyframes flash-left {
+  .pulse .status-flank:last-of-type {
+    animation: pulse-right 2s ease-in-out infinite;
+  }
+
+  @keyframes pulse-left {
     50% {
-      transform: translateX(20px);
+      transform: translateX(0px);
     }
   }
 
-  @keyframes flash-right {
+  @keyframes pulse-right {
     50% {
-      transform: translateX(-20px);
+      transform: translateX(0px);
     }
   }
 </style>

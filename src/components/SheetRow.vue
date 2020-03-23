@@ -197,7 +197,6 @@ export default {
   flex-direction: row;
   padding: 4px 8px;
   position: relative;
-  /* margin-left: 4px; */
 }
 
   .header .letter-box-container {
@@ -224,10 +223,6 @@ export default {
     width: calc(100% - 3px);
     z-index: -1;
   }
-
-  /* .highlight .letter-box-container {
-    background-color: var(--light-blue);
-  } */
 
 .letter-box, .score-box {
   font-family: var(--sans);
