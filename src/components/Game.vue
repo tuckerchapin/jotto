@@ -1,12 +1,19 @@
 <script>
 import SheetRow from '@/components/SheetRow.vue';
 
+const NEW_GAME = 0;
+const AWAIT_MY_SECRET = 1;
+const AWAIT_THEIR_SECRET = 2;
+const GAME_OVER = 3;
+const MY_TURN = 4;
+const THEIR_TURN = 5;
+
 export default {
   name: 'Game',
 
   data() {
     return {
-      wordEntryField: '',
+      secretWord: '',
     };
   },
 
@@ -15,8 +22,24 @@ export default {
       return !!this.$store.state.game.id;
     },
 
+    isOwner() {
+      return this.$store.state.lobby.isOwner;
+    },
+
     winner() {
       return this.$store.state.game.winner;
+    },
+
+    myId() {
+      return this.$store.getters['game/myId'];
+    },
+
+    theirId() {
+      return this.$store.getters['game/theirId'];
+    },
+
+    isValidSecretWord() {
+      return this.secretWord.length === 5;
     },
 
     myWord() {
@@ -40,15 +63,31 @@ export default {
     },
 
     status() {
-      return 0;
-      // your turn
-      // their turn
-      // waiting for you to enter a word
-      // waiting for them to enter a word
-      // you won
-      // you lost
-      // draw
-      // clean slate
+      if (!this.isInGame) {
+        // waiting to start new game (first time)
+        return NEW_GAME;
+      }
+
+      if (!this.myWord) {
+        // waiting for you to enter your word
+        return AWAIT_MY_SECRET;
+      }
+
+      if (!this.theirWord) {
+        // waiting for opponent to enter a word
+        return AWAIT_THEIR_SECRET;
+      }
+
+      if (this.winner) {
+        // game over
+        return GAME_OVER;
+      }
+
+      if (this.isMyTurn) {
+        return MY_TURN;
+      }
+
+      return THEIR_TURN;
     },
   },
 
@@ -61,14 +100,20 @@ export default {
       this.wordEntryField = value;
     },
 
-    handleSaveWord() {
-      this.$store.dispatch('game/setMyWord', { word: this.wordEntryField });
-      this.wordEntryField = '';
+    handleSetWord() {
+      if (this.isValidSecretWord) {
+        this.$store.dispatch('game/setMyWord', { word: this.secretWord });
+      }
     },
 
-    handleSaveGuess() {
-      this.$store.dispatch('game/setMyGuess', { word: this.wordEntryField });
-      this.wordEntryField = '';
+    handleSaveGuess(word) {
+      if (word.length === 5) {
+        this.$store.dispatch('game/setMyGuess', { word });
+      }
+    },
+
+    handleSecretWordChanged(newWord) {
+      this.secretWord = newWord;
     },
   },
 
@@ -80,29 +125,50 @@ export default {
     const statusBar = () => (
       <div class='status-bar'>
         <div class='status-flank'></div>
-        <div class='status-text'>Set your secret word</div>
+        <div class='status-text'>{this.status}</div>
         <div class='status-flank'></div>
       </div>
     );
 
     const sheetHeader = () => (
       <div class='sheet-header'>
-        <SheetRow header left/>
+        <SheetRow
+          header
+          left
+          word={this.myWord}
+          disabled={this.status !== AWAIT_MY_SECRET}
+          onChange={this.handleSecretWordChanged}
+        />
         <div class='sheet-header-actions'>
-          {/* <button
-            class='button small'
-            onClick={this.handleNewGame}
-          >
-            New Game
-          </button> */}
-          {/* */}<button
-            class='button small'
-            disabled
-          >
-            Set word
-          </button>{/* */}
+          {(this.status === NEW_GAME || this.status === GAME_OVER) && this.isOwner
+            ? (
+              <button
+                class='button small'
+                onClick={this.handleNewGame}
+              >
+                New Game
+              </button>
+            )
+            : null
+          }
+          {this.status === AWAIT_MY_SECRET
+            ? (
+              <button
+                class='button small'
+                disabled={!this.isValidSecretWord}
+                onClick={this.handleSetWord}
+              >
+                Set word
+              </button>
+            )
+            : null
+          }
         </div>
-        <SheetRow header disabled/>
+        <SheetRow
+          header
+          hide
+          disabled={this.status === AWAIT_MY_SECRET}
+        />
       </div>
     );
 
@@ -120,7 +186,7 @@ export default {
           <SheetRow disabled score={4} left/>
           <SheetRow disabled score={4} left/>
           <SheetRow disabled score={4} left/>
-          <SheetRow score={4} left/>
+          <SheetRow score={4} left onSubmit={alert}/>
         </div>
         <div id='their-sheet' class='sheet'>
           <SheetRow disabled score={4}/>
@@ -190,7 +256,7 @@ export default {
   }
 
   .action-waiting .status-text {
-    background-color: var(--light-blue);
+    background-color: var(--medium-blue);
     font-style: normal;
     color: white;
     z-index: 1;
@@ -198,12 +264,12 @@ export default {
 
   .action-waiting .status-flank:first-of-type {
     animation: flash-left 2s ease-in-out infinite;
-    background-image: linear-gradient(to left, var(--light-blue) 20px, transparent 30%);
+    background-image: linear-gradient(to left, var(--medium-blue) 20px, transparent 30%);
   }
 
   .action-waiting .status-flank:last-of-type {
     animation: flash-right 2s ease-in-out infinite;
-    background-image: linear-gradient(to right, var(--light-blue) 20px, transparent 30%);
+    background-image: linear-gradient(to right, var(--medium-blue) 20px, transparent 30%);
   }
 
   @keyframes flash-left {

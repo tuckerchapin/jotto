@@ -145,7 +145,7 @@ export default {
 }
 
 .copied {
-  color: var(--light-blue);
+  color: var(--medium-blue);
 }
 </style>
 

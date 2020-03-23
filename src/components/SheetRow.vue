@@ -20,7 +20,10 @@ export default {
       type: String,
       default: '',
     },
-    score: Number,
+    score: {
+      type: [Number, String],
+      default: '',
+    },
   },
 
   data() {
@@ -31,8 +34,24 @@ export default {
   },
 
   computed: {
-    displayWord() {
-      return this.letterList.join('');
+    rowWord() {
+      return this.letterList.join('').toLowerCase();
+    },
+
+    isValidWord() {
+      return this.rowWord.length === 5;
+    },
+  },
+
+  watch: {
+    rowWord(newWord, oldWord) {
+      if (newWord !== oldWord) {
+        this.$emit('change', newWord);
+      }
+    },
+
+    word() {
+      this.parseWord();
     },
   },
 
@@ -64,6 +83,19 @@ export default {
           if (this.selected < 4) {
             this.selected += 1;
           }
+        } else if (e.key === 'Backspace') {
+          if (this.letterList[this.selected]) {
+            // if there is a letter in this cell, delete it
+            this.$set(this.letterList, this.selected, '');
+
+            // ?? unclear on what "feels best" here
+            // if (this.selected > 0) {
+            //   this.selected -= 1;
+            // }
+          } else if (this.selected > 0) {
+            this.selected -= 1;
+            this.$set(this.letterList, this.selected, ''); // ?? unclear on what "feels best" here
+          }
         } else if (e.key === 'ArrowLeft') {
           if (this.selected > 0) {
             this.selected -= 1;
@@ -71,18 +103,6 @@ export default {
         } else if (e.key === 'ArrowRight') {
           if (this.selected < 4) {
             this.selected += 1;
-          }
-        } else if (e.key === 'Backspace') {
-          if (this.letterList[this.selected]) {
-            // if there is a letter in this cell, delete it
-            this.$set(this.letterList, this.selected, '');
-
-            // if (this.selected > 0) {
-            //   this.selected -= 1;
-            // }
-          } else if (this.selected > 0) {
-            this.selected -= 1;
-            this.$set(this.letterList, this.selected, ''); // ??
           }
         }
 
@@ -92,28 +112,42 @@ export default {
         e.preventDefault();
       }
     },
+
+    handleSubmit() {
+      if (!this.disabled && this.isValidWord) {
+        this.$emit('submit', this.rowWord);
+      }
+    },
+
+    parseWord() {
+      if (this.word) {
+        for (let i = 0; i < this.word.length; i += 1) {
+          this.$set(this.letterList, i, this.word[i].toUpperCase());
+        }
+      }
+    },
   },
 
   created() {
-    if (this.word) {
-      for (let i = 0; i < this.word.length; i += 1) {
-        this.$set(this.letterList, i, this.word[i].toUpperCase());
-      }
-    }
+    // TODO possibly unnecessary
+    this.parseWord();
   },
 
   render() {
     const scoreBox = () => (
-      <div class='score-box'>
-        {!this.disabled
-          ? (
+      !this.disabled
+        ? (
+          <div class={`score-box submit-button ${this.isValidWord || 'disabled'}`} onClick={this.handleSubmit}>
             <svg class='icon check' version="1.1" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
               <path d="m0 53.891 11.109-14.445 28.891 24.445 46.668-52.223 13.332 12.223-58.891 64.441z"/>
             </svg>
-          )
-          : <span class='score'>{this.score || ''}</span>
-        }
-      </div>
+          </div>
+        )
+        : (
+          <div class='score-box'>
+            <span class='score'>{this.score || ''}</span>
+          </div>
+        )
     );
 
     return (
@@ -186,7 +220,7 @@ export default {
 
   .letter-box:focus {
     outline: none !important;
-    border-color: var(--light-blue);
+    border-color: var(--medium-blue);
     /* animation: blinker 2s ease-in-out infinite; */
   }
 
@@ -206,11 +240,29 @@ export default {
     display: none;
   }
 
-  .score {
-    user-select: none;
+  .score-box.submit-button {
+    background-color: var(--submit-button);
+    cursor: pointer;
   }
 
-  .icon.check {
-    fill: var(--gold);
+    .score-box.submit-button:not(.disabled):hover {
+      background-color: var(--submit-button-hover);
+    }
+
+    .score-box.submit-button:not(.disabled):active {
+      filter: brightness(.9);
+    }
+
+    .icon.check {
+      fill: var(--submit-button-icon);
+    }
+
+    .score-box.submit-button.disabled {
+      cursor: not-allowed;
+      background-color: var(--submit-button-disabled);
+    }
+
+  .score {
+    user-select: none;
   }
 </style>

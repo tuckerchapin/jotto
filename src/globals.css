@@ -8,14 +8,15 @@
   --dark-grey: rgb(128, 128, 128);
   --paper: rgb(244, 242, 231);
   --gold: rgb(195, 156, 92);
-  --light-blue: rgb(77, 159, 203);
+  --medium-blue: rgb(77, 159, 203);
+  --light-blue: rgb(140, 187, 212);
 
   --button: black;
-  --button-hover: var(--light-blue);
+  --button-hover: var(--medium-blue);
   --button-disabled: var(--dark-grey);
 
   --input: black;
-  --input-active: var(--light-blue);
+  --input-active: var(--medium-blue);
 
   --column-size: 370px;/*400px;*/
   --column-gap: 60px;
@@ -24,6 +25,10 @@
   --letter-box-header-border: var(--medium-grey);
   --letter-box-dimension: 50px;
   --letter-box-color: white;
+  --submit-button: var(--light-blue);
+  --submit-button-hover: var(--medium-blue);
+  --submit-button-icon: white;
+  --submit-button-disabled: var(--medium-grey);
 }
 
 body {
