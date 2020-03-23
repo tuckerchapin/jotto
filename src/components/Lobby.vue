@@ -82,8 +82,8 @@ export default {
       return (
         <div class='in-game'>
           <div class='lobby-header'>
-            <div class='lobby-name'>{this.myName} (You) {this.isOwner ? this.renderCrown() : null}</div>
             <div class='lobby-name'>{this.theirName}{!this.isOwner ? this.renderCrown() : null}</div>
+            <div class='lobby-name'>{this.myName} (You) {this.isOwner ? this.renderCrown() : null}</div>
           </div>
           <Game/>
         </div>

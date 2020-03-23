@@ -112,6 +112,8 @@ export default {
           if (this.selected < 4) {
             this.selected += 1;
           }
+        } else if (e.key === 'Enter') {
+          this.handleSubmit();
         }
 
         this.focus(this.selected);
@@ -153,7 +155,7 @@ export default {
         )
         : (
           <div class='score-box'>
-            <span class='score'>{this.score || ''}</span>
+            <span class='score'>{this.score >= 0 ? this.score : ''}</span>
           </div>
         )
     );
@@ -162,7 +164,7 @@ export default {
       <div class={`sheet-row ${!this.header || 'header'} ${!this.highlight || 'highlight'}`} onKeyup={this.handleKeyPress}>
         {!this.left ? scoreBox() : null}
         <div class='letter-box-container'>
-          <div class='letter-box-highlighter'></div>
+          {this.header ? null : <div class='letter-box-highlighter'></div>}
           {[0, 1, 2, 3, 4].map((i) => (
             <div
               class='letter-box'
@@ -201,6 +203,10 @@ export default {
   .header .letter-box-container {
     background-color: var(--letter-box-header-border);
     padding: 8px;
+  }
+
+  .header.highlight .letter-box-container {
+    background-color: var(--light-blue);
   }
 
   .letter-box-highlighter {
@@ -249,9 +255,13 @@ export default {
     border-color: var(--letter-box-header-border);
   }
 
+  .header.highlight .letter-box {
+    border-color: var(--light-blue);
+  }
+
   .letter-box:focus {
     outline: none !important;
-    border-color: var(--medium-blue);
+    border-color: var(--medium-blue) !important;
     /* animation: blinker 2s ease-in-out infinite; */
   }
 

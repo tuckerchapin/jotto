@@ -270,6 +270,11 @@ export default new Vuex.Store({
         },
 
         isMyTurn(state, getters) {
+          if (!getters.myWord || !getters.theirWord) {
+            // still choosing secret words
+            return false;
+          }
+
           if (getters.myPlayerNumber === 0) {
             // we're the owner, so we go first when equal
             return state.guesses[0].length === state.guesses[1].length;

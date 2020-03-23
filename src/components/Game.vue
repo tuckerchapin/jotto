@@ -14,6 +14,8 @@ export default {
   data() {
     return {
       secretWord: '',
+      statusText: '',
+      statusClass: '',
     };
   },
 
@@ -40,6 +42,10 @@ export default {
 
     theirId() {
       return this.$store.getters['game/theirId'];
+    },
+
+    theirName() {
+      return this.$store.getters['lobby/theirName'];
     },
 
     isValidSecretWord() {
@@ -95,18 +101,21 @@ export default {
     },
   },
 
+  watch: {
+    status(newStatus) {
+      this.setStatusBarContent(newStatus);
+    },
+  },
+
   methods: {
     handleNewGame() {
       this.$store.dispatch('game/create');
     },
 
-    handleWordEntry(value) {
-      this.wordEntryField = value;
-    },
-
     handleSetWord() {
       if (this.isValidSecretWord) {
         this.$store.dispatch('game/setMyWord', { word: this.secretWord });
+        this.secretWord = '';
       }
     },
 
@@ -119,17 +128,57 @@ export default {
     handleSecretWordChanged(newWord) {
       this.secretWord = newWord;
     },
+
+    setStatusBarContent(status) {
+      switch (status) {
+        case NEW_GAME:
+          if (this.isOwner) {
+            this.statusText = 'Start a new game.';
+          } else {
+            this.statusText = 'Waiting for lobby owner to start a new game...';
+          }
+          break;
+        case AWAIT_MY_SECRET:
+          this.statusText = 'Choose your secret word.';
+          break;
+        case AWAIT_THEIR_SECRET:
+          this.statusText = 'Waiting for opponent to choose their secret word...';
+          break;
+        case GAME_OVER:
+          if (this.winner === this.myId) {
+            this.statusText = 'You win!';
+          } else if (this.winner === this.theirId) {
+            this.statusText = `${this.theirName} wins!`;
+          } else {
+            this.statusText = 'Draw!';
+          }
+
+          if (this.isOwner) {
+            this.statusText += ' Play again?';
+          }
+          break;
+        case MY_TURN:
+          this.statusText = 'Your turn.';
+          break;
+        case THEIR_TURN:
+          this.statusText = `${this.theirName}'s turn...`;
+          break;
+        default:
+          break;
+      }
+    },
   },
 
   created() {
     this.$store.dispatch('game/autojoin');
+    this.setStatusBarContent(this.status);
   },
 
   render() {
     const statusBar = () => (
       <div class='status-bar'>
         <div class='status-flank'></div>
-        <div class='status-text'>{this.status}</div>
+        <div class='status-text'>{this.statusText}</div>
         <div class='status-flank'></div>
       </div>
     );
@@ -138,10 +187,8 @@ export default {
       <div class='sheet-header'>
         <SheetRow
           header
-          left
-          word={this.myWord}
-          disabled={this.status !== AWAIT_MY_SECRET}
-          onChange={this.handleSecretWordChanged}
+          hide
+          disabled={this.status === AWAIT_MY_SECRET}
         />
         <div class='sheet-header-actions'>
           {(this.status === NEW_GAME || this.status === GAME_OVER) && this.isOwner
@@ -170,8 +217,11 @@ export default {
         </div>
         <SheetRow
           header
-          hide
-          disabled={this.status === AWAIT_MY_SECRET}
+          left
+          highlight={this.status === AWAIT_MY_SECRET}
+          word={this.myWord}
+          disabled={this.status !== AWAIT_MY_SECRET}
+          onChange={this.handleSecretWordChanged}
         />
       </div>
     );
@@ -185,11 +235,12 @@ export default {
             ([word, score]) => <SheetRow disabled word={word} score={score} left/>,
           )}
           {[...Array(this.turnLimit - this.myGuesses.length)].map((_, key) => {
-            if (key === 0) {
+            if (key === 0 && this.status !== GAME_OVER && this.status !== NEW_GAME) {
               return (
                 <SheetRow
                   left
-                  highlight
+                  disabled={!this.myWord}
+                  highlight={this.isMyTurn}
                   noSubmit={!this.isMyTurn}
                   onSubmit={this.handleSaveGuess}
                 />
