@@ -48,10 +48,6 @@ export default {
       this.$store.dispatch('lobby/create');
     },
 
-    handleNewGame() {
-      this.$store.dispatch('game/create');
-    },
-
     handleCopyInvite() {
       navigator.clipboard.writeText(window.location.href)
         .then(() => {
@@ -131,8 +127,6 @@ export default {
 
 </script>
 
-<style src="@/globals.css"></style>
-
 <style>
 .lobby-select {
   height: 100vh;
@@ -176,7 +170,7 @@ export default {
   align-items: center;
   justify-content: center;
 
-  margin: 40px 0;
+  margin-top: 40px;
 
   font-size: 20px;
   font-family: var(--sans);
@@ -185,5 +179,6 @@ export default {
 .icon.crown {
   fill: var(--gold);
   margin-left: 5px;
+  margin-bottom: 5px;
 }
 </style>

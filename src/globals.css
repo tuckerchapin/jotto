@@ -1,12 +1,11 @@
-@import url('https://fonts.googleapis.com/css?family=Montserrat:300,400,500,600,700|Playfair+Display:400,400i,500,700&display=swap');
+@import url('https://fonts.googleapis.com/css?family=Montserrat:300,400,500,600,700&display=swap');
 
 :root {
-  --serif: 'Playfair Display', serif;
   --sans: 'Montserrat', sans-serif;
 
   --light-grey: rgb(238, 238, 238);
-  --medium-grey: rgb(124, 124, 124);
-  --dark-grey: rgb(64, 64, 64);
+  --medium-grey: rgb(200, 200, 200);
+  --dark-grey: rgb(128, 128, 128);
   --paper: rgb(244, 242, 231);
   --gold: rgb(195, 156, 92);
   --light-blue: rgb(77, 159, 203);
@@ -16,8 +15,12 @@
   --input: black;
   --input-active: var(--light-blue);
 
-  --column-size: 400px;
+  --column-size: min-content;/*400px;*/
   --column-gap: 50px;
+
+  --letter-box-border: var(--dark-grey);
+  --letter-box-header-border: var(--medium-grey);
+  --letter-box-dimension: 50px;
 }
 
 body {

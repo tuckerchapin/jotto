@@ -1,4 +1,5 @@
 <script>
+import SheetRow from '@/components/SheetRow.vue';
 
 export default {
   name: 'Game',
@@ -10,6 +11,10 @@ export default {
   },
 
   computed: {
+    isInGame() {
+      return !!this.$store.state.game.id;
+    },
+
     winner() {
       return this.$store.state.game.winner;
     },
@@ -33,9 +38,25 @@ export default {
     theirGuesses() {
       return this.$store.getters['game/theirGuesses'];
     },
+
+    status() {
+      return 0;
+      // your turn
+      // their turn
+      // waiting for you to enter a word
+      // waiting for them to enter a word
+      // you won
+      // you lost
+      // draw
+      // clean slate
+    },
   },
 
   methods: {
+    handleNewGame() {
+      this.$store.dispatch('game/create');
+    },
+
     handleWordEntry(value) {
       this.wordEntryField = value;
     },
@@ -56,60 +77,150 @@ export default {
   },
 
   render() {
-    if (!this.myWord || !this.theirWord) { // word entry phase
-      return (
-        <div class='gamecontainer'>
-          {this.myWord
-            ? <div>{this.myWord}</div>
-            : <div>
-                <input
-                  value={this.wordEntryField}
-                  onChange={(e) => this.handleWordEntry(e.target.value)}
-                />
-                <button onClick={this.handleSaveWord}>save</button>
-              </div>
-          }
-          <div>
-            {this.theirWord ? this.theirWord : 'waiting for opponent to choose a word'}
-          </div>
+    const statusBar = () => (
+      <div class='status-bar'>
+        it's your turn!
+      </div>
+    );
+
+    const sheetHeader = () => (
+      <div class='sheet-header'>
+        <SheetRow header left/>
+        <div>
+          <button
+            class='button small'
+            onClick={this.handleNewGame}
+          >
+            New game
+          </button>
         </div>
-      );
-    }
+        <SheetRow header/>
+      </div>
+    );
 
     return (
-      <div class='gamecontainer'>
-        <div class='column'>
-        my word: {this.myWord}
-        {this.myGuesses.map((guess) => <div>{guess[1]} | {guess[0]}</div>)}
-          <div>
-            <input onChange={(e) => this.handleWordEntry(e.target.value)}/>
-            {this.isMyTurn ? <button onClick={this.handleSaveGuess}>save</button> : null}
-          </div>
+      <div class='game-container'>
+        {statusBar()}
+        {sheetHeader()}
+        <div id='my-sheet' class='sheet'>
+          <SheetRow left score={4}/>
+          <SheetRow left score={5}/>
+          <SheetRow left score={4}/>
+          <SheetRow left score={5}/>
+          <SheetRow left score={4}/>
+          <SheetRow left score={5}/>
+          <SheetRow left score={4}/>
+          <SheetRow left score={5}/>
+          <SheetRow left score={4}/>
+          <SheetRow left score={5}/>
         </div>
-        <div class='column'>
-        their word: {this.theirWord}
-        {this.theirGuesses.map((guess) => <div>{guess[1]} | {guess[0]}</div>)}
+        <div id='their-sheet' class='sheet'>
+          <SheetRow score={4}/>
+          <SheetRow score={4}/>
+          <SheetRow score={4}/>
+          <SheetRow score={4}/>
+          <SheetRow score={4}/>
+          <SheetRow score={4}/>
+          <SheetRow score={4}/>
+          <SheetRow score={4}/>
+          <SheetRow score={4}/>
+          <SheetRow score={4}/>
         </div>
       </div>
     );
+
+    // my word: {this.myWord}
+    // {this.theirGuesses.map((guess) => <div>{guess[1]} | {guess[0]}</div>)}
+    // their word: {this.theirWord}
+    // {this.myGuesses.map((guess) => <div>{guess[1]} | {guess[0]}</div>)}
+    //   <div>
+    //     <input onChange={(e) => this.handleWordEntry(e.target.value)}/>
+    //     {this.isMyTurn ? <button onClick={this.handleSaveGuess}>save</button> : null}
+    //   </div>
+    // if (!this.isInGame) {
+    //   return (
+    //   );
+    // }
+
+    // if (!this.myWord || !this.theirWord) { // word entry phase
+    //   return (
+    //     <div class='gamecontainer'>
+    //       {this.myWord
+    //         ? <div>{this.myWord}</div>
+    //         : <div>
+    //             <input
+    //               value={this.wordEntryField}
+    //               onChange={(e) => this.handleWordEntry(e.target.value)}
+    //             />
+    //             <button onClick={this.handleSaveWord}>save</button>
+    //           </div>
+    //       }
+    //       <div>
+    //         {this.theirWord ? this.theirWord : 'waiting for opponent to choose a word'}
+    //       </div>
+    //     </div>
+    //   );
+    // }
+
+    // return (
+    //   <div class='gamecontainer'>
+    //     <div class='column'>
+    //     my word: {this.myWord}
+    //     {this.myGuesses.map((guess) => <div>{guess[1]} | {guess[0]}</div>)}
+    //       <div>
+    //         <input onChange={(e) => this.handleWordEntry(e.target.value)}/>
+    //         {this.isMyTurn ? <button onClick={this.handleSaveGuess}>save</button> : null}
+    //       </div>
+    //     </div>
+    //     <div class='column'>
+    //     their word: {this.theirWord}
+    //     {this.theirGuesses.map((guess) => <div>{guess[1]} | {guess[0]}</div>)}
+    //     </div>
+    //   </div>
+    // );
   },
 };
 
 </script>
 
-<style src="@/globals.css"></style>
-
 <style>
-.gamecontainer {
+.game-container {
   display: grid;
   grid-template-columns: var(--column-size) var(--column-size);
   column-gap: var(--column-gap);
   justify-content: center;
+  grid-template-rows: min-content min-content;
+  grid-template-areas:
+    "status status"
+    "header header"
+    "mysheet theirsheet";
 }
 
-.column {
-  display: grid;
-  grid-template-columns: 1fr;
-  grid-auto-rows: min-content;
+.status-bar {
+  grid-area: status;
+  /* display: flex;
+  justify-content: space-between; */
+
+  /* margin: 20px; */
+}
+
+.sheet-header {
+  grid-area: header;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.sheet {
+  /* background-color: white; */
+}
+
+#my-sheet {
+  grid-area: mysheet;
+}
+
+#their-sheet {
+  grid-area: theirsheet;
 }
 </style>
