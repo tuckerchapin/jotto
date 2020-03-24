@@ -134,12 +134,15 @@ export default {
         for (let i = 0; i < this.word.length; i += 1) {
           this.$set(this.letterList, i, this.word[i].toUpperCase());
         }
+      } else {
+        for (let i = 0; i < 5; i += 1) {
+          this.$set(this.letterList, i, '');
+        }
       }
     },
   },
 
   created() {
-    // TODO possibly unnecessary
     this.parseWord();
   },
 
@@ -161,7 +164,7 @@ export default {
     );
 
     return (
-      <div class={`sheet-row ${!this.header || 'header'} ${!this.highlight || 'highlight'}`} onKeyup={this.handleKeyPress}>
+      <div class={`sheet-row ${!this.header || 'header'} ${!this.highlight || 'highlight'} ${!this.disabled || 'disabled'}'`} onKeyup={this.handleKeyPress}>
         {!this.left ? scoreBox() : null}
         <div class='letter-box-container'>
           {this.header ? null : <div class='letter-box-highlighter'></div>}
@@ -236,6 +239,7 @@ export default {
   text-align: center;
   background-color: var(--letter-box-color);
   border: 1px solid var(--light-grey);
+  user-select: none;
 }
 
 .letter-box {

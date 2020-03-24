@@ -110,6 +110,7 @@ export default {
   methods: {
     handleNewGame() {
       this.$store.dispatch('game/create');
+      this.$forceUpdate();
     },
 
     handleSetWord() {
