@@ -165,11 +165,11 @@ export default new Vuex.Store({
                   dispatch('sync', { id: lobby.id });
                 });
               } else {
-                alert('could not join lobby'); // TODO
+                alert('Lobby full.'); // TODO
               }
             })
             .catch((error) => {
-              alert('invalid lobby'); // TODO
+              alert('Invalid lobby invite code.'); // TODO
               console.error(error);
             });
         },
@@ -359,7 +359,7 @@ export default new Vuex.Store({
               dispatch('sync', { id: game.id });
             })
             .catch((error) => {
-              alert('invalid game'); // TODO
+              alert('Invalid game.'); // TODO
               console.error(error);
             });
         },

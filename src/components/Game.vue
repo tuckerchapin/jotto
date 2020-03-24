@@ -229,6 +229,7 @@ export default {
         <SheetRow
           header
           hide
+          word={this.status === GAME_OVER ? this.theirWord : ''}
           disabled={this.status === AWAIT_MY_SECRET}
         />
         <div class='sheet-header-actions'>
