@@ -110,7 +110,6 @@ export default {
   methods: {
     handleNewGame() {
       this.$store.dispatch('game/create');
-      this.$forceUpdate();
     },
 
     handleSetWord() {
@@ -266,6 +265,20 @@ export default {
           )}
           {[...Array(this.turnLimit - this.theirGuesses.length)].map(() => <SheetRow disabled/>)}
         </div>
+        <div id='letter-tracker'>
+          {['a', 'b', 'c', 'd', 'e',
+            'f', 'g', 'h', 'i', 'j',
+            'k', 'l', 'm', 'n', 'o',
+            'p', 'q', 'r', 's', 't',
+            'u', 'v', 'w', 'x', 'y',
+            'z'].map((letter) => (
+              <div
+                class='a-letter'
+              >
+                {letter}
+              </div>
+          ))}
+        </div>
       </div>
     );
   },
@@ -279,11 +292,12 @@ export default {
   grid-template-columns: var(--column-size) var(--column-size);
   column-gap: var(--column-gap);
   justify-content: center;
-  grid-template-rows: min-content min-content;
+  grid-template-rows: repeat(4, min-content);
   grid-template-areas:
     "status status"
     "header header"
-    "mysheet theirsheet";
+    "mysheet theirsheet"
+    "tracker tracker";
 }
 
 .sheet-header {
@@ -300,6 +314,25 @@ export default {
 
 #their-sheet {
   grid-area: theirsheet;
+}
+
+#letter-tracker {
+  grid-area: tracker;
+  display: grid;
+  grid-template-columns: repeat(13, 1fr);
+  margin-top: 10px;
+  /* row-gap: 10px; */
+  align-content: center;
+}
+
+.a-letter {
+  font-family: var(--sans);
+  font-weight: 500;
+  font-size: 1.25em;
+  text-transform: uppercase;
+  text-align: center;
+  padding: 10px;
+  user-select: none;
 }
 </style>
 
@@ -374,16 +407,6 @@ export default {
     .draw .status-flank:last-of-type {
       background-image: linear-gradient(to right, var(--draw) 20px, transparent 30%);
     }
-
-  /* .status-flank:first-of-type {
-    transform: translateX(20px);
-    animation: pulse-left .5s ease-in-out;
-  }
-
-  .status-flank:last-of-type {
-    transform: translateX(-20px);
-    animation: pulse-right .5s ease-in-out;
-  } */
 
   .pulse .status-flank:first-of-type {
     animation: pulse-left 2s ease-in-out infinite;
