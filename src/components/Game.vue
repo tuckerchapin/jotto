@@ -16,6 +16,34 @@ export default {
       secretWord: '',
       statusText: '',
       statusClass: '',
+      letterTracker: {
+        a: 0,
+        b: 0,
+        c: 0,
+        d: 0,
+        e: 0,
+        f: 0,
+        g: 0,
+        h: 0,
+        i: 0,
+        j: 0,
+        k: 0,
+        l: 0,
+        m: 0,
+        n: 0,
+        o: 0,
+        p: 0,
+        q: 0,
+        r: 0,
+        s: 0,
+        t: 0,
+        u: 0,
+        v: 0,
+        w: 0,
+        x: 0,
+        y: 0,
+        z: 0,
+      },
     };
   },
 
@@ -127,6 +155,10 @@ export default {
 
     handleSecretWordChanged(newWord) {
       this.secretWord = newWord;
+    },
+
+    handleLetterClicked(letter) {
+      this.$set(this.letterTracker, letter, this.letterTracker[letter] + 1);
     },
 
     setStatusBarContent(status) {
@@ -266,15 +298,17 @@ export default {
           {[...Array(this.turnLimit - this.theirGuesses.length)].map(() => <SheetRow disabled/>)}
         </div>
         <div id='letter-tracker'>
-          {['a', 'b', 'c', 'd', 'e',
-            'f', 'g', 'h', 'i', 'j',
-            'k', 'l', 'm', 'n', 'o',
-            'p', 'q', 'r', 's', 't',
-            'u', 'v', 'w', 'x', 'y',
-            'z'].map((letter) => (
+          {Object.keys(this.letterTracker).map((letter) => (
               <div
                 class='a-letter'
+                onClick={() => this.handleLetterClicked(letter)}
               >
+                <svg class={`letter-circle ${this.letterTracker[letter] % 3 === 2 ? 'show' : ''}`} version="1.1" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                  <path d="m50 5c-24.816 0-45 20.184-45 45s20.184 45 45 45 45-20.184 45-45-20.184-45-45-45zm0 6c21.574 0 39 17.426 39 39s-17.426 39-39 39-39-17.426-39-39 17.426-39 39-39z"/>
+                </svg>
+                <svg class={`letter-slash ${this.letterTracker[letter] % 3 === 1 ? 'show' : ''}`} version="1.1" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                  <path d="m3.125 100c-0.80078 0-1.6016-0.30469-2.2109-0.91406-1.2188-1.2188-1.2188-3.1992 0-4.418l93.75-93.75c1.2188-1.2188 3.1992-1.2188 4.418 0s1.2188 3.1992 0 4.418l-93.75 93.75c-0.60547 0.60937-1.4062 0.91406-2.207 0.91406z"/>
+                </svg>
                 {letter}
               </div>
           ))}
@@ -315,25 +349,67 @@ export default {
 #their-sheet {
   grid-area: theirsheet;
 }
+</style>
 
+<style>
 #letter-tracker {
   grid-area: tracker;
   display: grid;
-  grid-template-columns: repeat(13, 1fr);
-  margin-top: 10px;
-  /* row-gap: 10px; */
+  grid-template-columns: repeat(13, 40px);
+  grid-template-rows: 40px 40px;
+  row-gap: 10px;
+  column-gap: 10px;
   align-content: center;
+  justify-content: center;
+  padding: 10px 10px 0;
 }
 
 .a-letter {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+
   font-family: var(--sans);
   font-weight: 500;
   font-size: 1.25em;
   text-transform: uppercase;
-  text-align: center;
-  padding: 10px;
+
   user-select: none;
+  cursor: pointer;
+  position: relative;
 }
+
+.letter-slash, .letter-circle {
+  height: 30px;
+  width: 30px;
+  position: absolute;
+  display: none;
+}
+
+.letter-slash.big {
+  height: 35px;
+  width: 35px;
+}
+
+.letter-circle.big {
+  height: 50px;
+  width: 50px;
+}
+
+.letter-slash {
+  fill: var(--dark-grey);
+}
+
+.letter-circle {
+  fill: var(--medium-red);
+}
+
+.show {
+  display: unset;
+}
+
+
 </style>
 
 <style>

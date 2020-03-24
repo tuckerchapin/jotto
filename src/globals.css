@@ -11,6 +11,7 @@
   --medium-blue: rgb(77, 159, 203);
   --light-blue: rgb(140, 187, 212);
   --medium-green: rgb(71, 108, 47);
+  --medium-red: rgb(170, 44, 40);
 
   --button: black;
   --button-hover: var(--medium-blue);
@@ -35,6 +36,8 @@
   --neutral: var(--medium-grey);
   --win: var(--medium-green);
   --draw: var(--gold);
+
+  --tracker-letter: var(--paper);
 }
 
 body {
