@@ -61,6 +61,7 @@ button:focus, input:focus {
   font-weight: 400;
   font-size: 1.25em;
   color: var(--button);
+  background-color: white;
 
   transition: color .2s, border-color .2s, ;
 }
