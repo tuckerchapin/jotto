@@ -1,4 +1,4 @@
 module.exports = {
   publicPath: '/jotto/',
-  productionSourceMap: false
+  productionSourceMap: false,
 }

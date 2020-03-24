@@ -49,13 +49,25 @@ export default {
     },
 
     handleCopyInvite() {
-      navigator.clipboard.writeText(window.location.href)
-        .then(() => {
-          this.justCopied = true;
-          clearTimeout(copiedTimeout);
-          copiedTimeout = setTimeout(() => { this.justCopied = false; }, 2000);
-        })
-        .catch(() => {});
+      clearTimeout(copiedTimeout);
+      const el = document.createElement('textarea');
+      el.value = window.location.href;
+      el.setAttribute('readonly', '');
+      el.style.position = 'absolute';
+      el.style.left = '-9999px';
+      document.body.appendChild(el);
+      const selected = document.getSelection().rangeCount > 0
+        ? document.getSelection().getRangeAt(0)
+        : false;
+      el.select();
+      document.execCommand('copy');
+      document.body.removeChild(el);
+      if (selected) {
+        document.getSelection().removeAllRanges();
+        document.getSelection().addRange(selected);
+      }
+      this.justCopied = true;
+      copiedTimeout = setTimeout(() => { this.justCopied = false; }, 2000);
     },
 
     renderCrown() {
